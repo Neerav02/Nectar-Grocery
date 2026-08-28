@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, Sparkles } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { ProductGrid } from '../components/product/ProductGrid';
 import { Product, Category, TabType } from '../types';
@@ -59,9 +59,11 @@ export const HomePage: React.FC<HomePageProps> = ({
     <div className="space-y-6 pb-24 md:pb-12 animate-fade-in">
       {/* Mobile Top Header (Carrot Icon + Location) */}
       <div className="md:hidden flex flex-col items-center pt-2">
-        <div className="w-8 h-8 rounded-xl bg-[#53B175] flex items-center justify-center text-white mb-2 shadow-xs">
-          <Sparkles className="w-5 h-5 fill-white stroke-none" />
-        </div>
+        <img
+          src="/images/Icon.png"
+          alt="Nectar Logo"
+          className="w-7 h-8 object-contain mb-2"
+        />
         <button
           type="button"
           onClick={onOpenLocation}

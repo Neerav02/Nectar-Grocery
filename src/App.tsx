@@ -1,6 +1,13 @@
 import { useState } from 'react';
-import { SplashPage } from './pages/SplashPage';
-import { OnboardingPage } from './pages/OnboardingPage';
+import { SplashPage } from './pages/auth/SplashPage';
+import { OnboardingPage } from './pages/auth/OnboardingPage';
+import { SignInWelcomePage } from './pages/auth/SignInWelcomePage';
+import { EnterNumberPage } from './pages/auth/EnterNumberPage';
+import { VerificationPage } from './pages/auth/VerificationPage';
+import { SelectLocationPage } from './pages/auth/SelectLocationPage';
+import { LogInPage } from './pages/auth/LogInPage';
+import { SignUpPage } from './pages/auth/SignUpPage';
+
 import { HomePage } from './pages/HomePage';
 import { CategoryListingPage } from './pages/CategoryListingPage';
 import { SearchPage } from './pages/SearchPage';
@@ -21,13 +28,27 @@ import { OrderFailureModal } from './components/cart/OrderFailureModal';
 import { Category, Product, TabType } from './types';
 import { useAuthStore } from './stores/useAuthStore';
 
-export function App() {
-  // App Lifecycle States
-  const [showSplash, setShowSplash] = useState(true);
-  const { hasCompletedOnboarding } = useAuthStore();
-  const openAuthModal = useAuthStore((state) => state.openAuthModal);
+type OnboardingStep =
+  | 'splash'
+  | 'onboarding'
+  | 'signin_welcome'
+  | 'enter_phone'
+  | 'otp_verification'
+  | 'select_location'
+  | 'login_email'
+  | 'signup_email'
+  | 'main_app';
 
-  // Active View Navigation
+export function App() {
+  const { hasCompletedOnboarding, isAuthenticated, setCompletedOnboarding, login, openAuthModal } =
+    useAuthStore();
+
+  // Onboarding & Auth Flow Step State
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>(
+    !hasCompletedOnboarding ? 'splash' : 'main_app'
+  );
+
+  // Active Main App Tab Navigation
   const [activeTab, setActiveTab] = useState<TabType>('shop');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -38,13 +59,11 @@ export function App() {
   const [isOrderSuccessOpen, setIsOrderSuccessOpen] = useState(false);
   const [isOrderFailureOpen, setIsOrderFailureOpen] = useState(false);
 
-  // Handlers
-  const handleSelectCategory = (category: Category) => {
-    setSelectedCategory(category);
-  };
-
-  const handleSelectProduct = (product: Product) => {
-    setSelectedProduct(product);
+  // Flow Step Handlers
+  const handleCompleteAuthSequence = () => {
+    login('user@nectar.com', 'Demo Customer');
+    setCompletedOnboarding(true);
+    setCurrentStep('main_app');
   };
 
   const handleTabChange = (tab: TabType) => {
@@ -53,14 +72,95 @@ export function App() {
     setSelectedProduct(null);
   };
 
-  if (showSplash) {
-    return <SplashPage onFinish={() => setShowSplash(false)} />;
+  const handleCheckoutClick = () => {
+    // Rule: Without login, no one can place an order!
+    if (!isAuthenticated) {
+      setCurrentStep('signin_welcome');
+      return;
+    }
+    setIsCheckoutOpen(true);
+  };
+
+  // 1. Splash Screen
+  if (currentStep === 'splash') {
+    return <SplashPage onFinish={() => setCurrentStep('onboarding')} />;
   }
 
-  if (!hasCompletedOnboarding) {
-    return <OnboardingPage onGetStarted={() => setActiveTab('shop')} />;
+  // 2. Onboarding Page (Delivery Person Photo + Logo)
+  if (currentStep === 'onboarding') {
+    return <OnboardingPage onGetStarted={() => setCurrentStep('signin_welcome')} />;
   }
 
+  // 3. Sign In Welcome Screen (Sing in.png)
+  if (currentStep === 'signin_welcome') {
+    return (
+      <SignInWelcomePage
+        onSelectPhone={() => setCurrentStep('enter_phone')}
+        onGoogleSignIn={handleCompleteAuthSequence}
+        onFacebookSignIn={handleCompleteAuthSequence}
+      />
+    );
+  }
+
+  // 4. Enter Mobile Number (Number.png)
+  if (currentStep === 'enter_phone') {
+    return (
+      <EnterNumberPage
+        onBack={() => setCurrentStep('signin_welcome')}
+        onSubmit={() => setCurrentStep('otp_verification')}
+      />
+    );
+  }
+
+  // 5. Verification / OTP Code (Verification.png)
+  if (currentStep === 'otp_verification') {
+    return (
+      <VerificationPage
+        onBack={() => setCurrentStep('enter_phone')}
+        onSubmit={() => setCurrentStep('select_location')}
+      />
+    );
+  }
+
+  // 6. Select Location (select location.png)
+  if (currentStep === 'select_location') {
+    return (
+      <SelectLocationPage
+        onBack={() => setCurrentStep('otp_verification')}
+        onSubmit={handleCompleteAuthSequence}
+      />
+    );
+  }
+
+  // 7. Email Login Screen (log in.png)
+  if (currentStep === 'login_email') {
+    return (
+      <LogInPage
+        onBack={() => setCurrentStep('signin_welcome')}
+        onSuccess={(email) => {
+          login(email, 'Imran Hossain');
+          setCurrentStep('main_app');
+        }}
+        onGoToSignUp={() => setCurrentStep('signup_email')}
+      />
+    );
+  }
+
+  // 8. Email Sign Up Screen (sign up.png)
+  if (currentStep === 'signup_email') {
+    return (
+      <SignUpPage
+        onBack={() => setCurrentStep('login_email')}
+        onSuccess={(name, email) => {
+          login(email, name);
+          setCurrentStep('main_app');
+        }}
+        onGoToLogIn={() => setCurrentStep('login_email')}
+      />
+    );
+  }
+
+  // 9. Main Application View
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#181725] flex flex-col font-sans selection:bg-[#53B175]/30">
       {/* Desktop Header Navbar */}
@@ -68,7 +168,13 @@ export function App() {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onOpenLocation={() => setIsLocationOpen(true)}
-        onOpenAuth={() => openAuthModal()}
+        onOpenAuth={() => {
+          if (!isAuthenticated) {
+            setCurrentStep('signin_welcome');
+          } else {
+            openAuthModal();
+          }
+        }}
         onOpenSearch={() => handleTabChange('explore')}
       />
 
@@ -84,29 +190,37 @@ export function App() {
             <CategoryListingPage
               category={selectedCategory}
               onBack={() => setSelectedCategory(null)}
-              onSelectProduct={handleSelectProduct}
+              onSelectProduct={setSelectedProduct}
             />
           ) : activeTab === 'shop' ? (
             <HomePage
-              onSelectProduct={handleSelectProduct}
+              onSelectProduct={setSelectedProduct}
               onNavigateTab={handleTabChange}
-              onSelectCategory={handleSelectCategory}
+              onSelectCategory={setSelectedCategory}
               onOpenLocation={() => setIsLocationOpen(true)}
             />
           ) : activeTab === 'explore' ? (
-            <SearchPage onSelectProduct={handleSelectProduct} />
+            <SearchPage onSelectProduct={setSelectedProduct} />
           ) : activeTab === 'cart' ? (
             <CartPage
-              onGoToCheckout={() => setIsCheckoutOpen(true)}
+              onGoToCheckout={handleCheckoutClick}
               onExplore={() => handleTabChange('explore')}
             />
           ) : activeTab === 'favourite' ? (
             <FavouritesPage
-              onSelectProduct={handleSelectProduct}
+              onSelectProduct={setSelectedProduct}
               onExplore={() => handleTabChange('explore')}
             />
           ) : (
-            <AccountPage onOpenAuth={() => openAuthModal()} />
+            <AccountPage
+              onOpenAuth={() => {
+                if (!isAuthenticated) {
+                  setCurrentStep('signin_welcome');
+                } else {
+                  openAuthModal();
+                }
+              }}
+            />
           )}
         </div>
       </main>
