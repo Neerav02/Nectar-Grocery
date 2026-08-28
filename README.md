@@ -1,14 +1,26 @@
-# 🛒 Nectar — Production-Grade Online Groceries Web Application
+<div align="center">
 
-[![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6.3%20Strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4.0-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Zustand](https://img.shields.io/badge/State-Zustand%20v4-764ABC?logo=redux&logoColor=white)](https://zustand-demo.pmnd.rs/)
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-000000?logo=vercel&logoColor=white)](https://github.com/Neerav02/Nectar-Grocery)
-[![Build Status](https://img.shields.io/badge/Build-Passing-53B175)](https://github.com/Neerav02/Nectar-Grocery)
+  <img src="public/images/ICON_1.png" alt="Nectar Logo" width="72" height="80" />
 
-A pixel-faithful, production-ready, mobile-first and desktop-adapted online grocery delivery application built from the 28-screen Nectar Grocery Figma design specification. Designed for ultra-high fidelity, seamless user experience, and robust asynchronous state management.
+  # **Nectar — Production-Grade Online Grocery Platform**
+
+  [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.6.3%20Strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4.0-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+  [![Zustand](https://img.shields.io/badge/State-Zustand%20v4-764ABC?logo=redux&logoColor=white)](https://zustand-demo.pmnd.rs/)
+  [![Vercel Live Demo](https://img.shields.io/badge/Vercel-Live%20Demo-000000?logo=vercel&logoColor=white)](https://nectar-grocery-flax.vercel.app)
+  [![Build Status](https://img.shields.io/badge/Build-Passing-53B175)](https://github.com/Neerav02/Nectar-Grocery)
+
+</div>
+
+---
+
+### 🌿 Executive Summary & Application Overview
+
+> **Nectar** is a pixel-perfect, hyper-performant, and production-ready quick-commerce online grocery platform engineered directly from the 28-screen Nectar Grocery Figma design system. Designed to deliver an uncompromising user experience across both mobile viewports and wide-screen desktop displays, Nectar bridges the gap between modern e-commerce UI micro-interactions and complex client-side state resilience. 
+> 
+> The application features a robust asynchronous data layer with variable network latency simulation, advanced stale-search race condition guards via `AbortController` cancellation, and real-time persisted cart synchronization (`validateAndSyncCart`) that dynamically adjusts for catalog price shifts, stock bounds, and discontinued items. Coupled with an interactive 4-step live order tracking dashboard and single-card desktop checkout, Nectar represents a standalone, enterprise-grade frontend architecture.
 
 ---
 
@@ -169,7 +181,7 @@ The project has been implemented to strictly satisfy 100% of the candidate assig
    - **Framework Preset**: `Vite`
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-4. Click **Deploy**. Vercel will build the project and issue a live URL (e.g. `https://nectar-grocery-three.vercel.app`).
+4. Click **Deploy**. Vercel will build the project and issue a live URL (e.g. `https://nectar-grocery-flax.vercel.app`).
 
 ### Method 2: Deploy via Vercel CLI (Terminal)
 1. Open terminal inside the project directory:
