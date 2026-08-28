@@ -54,16 +54,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, o
         </button>
       </div>
 
-      {/* ── Product Image Card ── */}
-      <div className="bg-[#F2F3F2] rounded-3xl flex flex-col items-center justify-center py-8 px-6 mb-6 border border-[#E9EAEC]">
+      {/* ── Product Image Card (Full Cover Display Stage) ── */}
+      <div className="relative w-full h-64 sm:h-72 md:h-80 rounded-3xl overflow-hidden border border-[#E9EAEC] mb-6 shadow-sm bg-[#F4F5F4]">
         <img
           src={product.imageUrl}
           alt={product.name}
-          className="w-full max-w-xs h-52 object-contain drop-shadow-lg transition-transform duration-300 hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
         />
 
-        {/* Carousel Dots */}
-        <div className="flex items-center space-x-2 mt-5">
+        {/* Carousel Dots Overlay */}
+        <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center space-x-2 z-10">
           {[0, 1, 2].map((idx) => (
             <button
               key={idx}
@@ -71,7 +71,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, o
               aria-label={`Image ${idx + 1}`}
               className={clsx(
                 'h-2 rounded-full transition-all duration-300 focus-visible:ring-2 focus-visible:ring-[#53B175]',
-                activeImageIndex === idx ? 'w-6 bg-[#53B175]' : 'w-2 bg-gray-300'
+                activeImageIndex === idx ? 'w-6 bg-[#53B175]' : 'w-2 bg-white/70 hover:bg-white'
               )}
             />
           ))}
