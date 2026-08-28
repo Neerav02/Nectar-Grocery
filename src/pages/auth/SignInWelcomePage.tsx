@@ -16,7 +16,7 @@ export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
       {/* Top Hero — fresh vegetables banner */}
       <div className="relative flex-shrink-0" style={{ height: '45vh' }}>
         <img
-          src="/images/signin_bg.png"
+          src="/images/Login_Image.png"
           alt="Fresh Groceries"
           className="w-full h-full object-cover object-top"
         />
