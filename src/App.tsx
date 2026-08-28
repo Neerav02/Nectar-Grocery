@@ -49,6 +49,7 @@ export function App() {
 
   // Active Main App Tab Navigation
   const [activeTab, setActiveTab] = useState<TabType>('shop');
+  const [accountSection, setAccountSection] = useState<'menu' | 'orders'>('menu');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -233,6 +234,7 @@ export function App() {
             />
           ) : (
             <AccountPage
+              initialSection={accountSection}
               onOpenAuth={() => {
                 if (!isAuthenticated) {
                   setCurrentStep('signin_welcome');
@@ -263,6 +265,7 @@ export function App() {
         onClose={() => setIsOrderSuccessOpen(false)}
         onTrackOrder={() => {
           setIsOrderSuccessOpen(false);
+          setAccountSection('orders');
           handleTabChange('account');
         }}
       />

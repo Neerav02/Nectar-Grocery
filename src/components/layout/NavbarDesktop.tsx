@@ -73,13 +73,13 @@ export const NavbarDesktop: React.FC<NavbarDesktopProps> = ({
         </button>
 
         {/* Global Desktop Search Trigger */}
-        <div className="flex-1 max-w-md relative">
+        <div className="flex-1 max-w-xs lg:max-w-md relative">
           <div
             onClick={onOpenSearch}
-            className="w-full bg-[#F2F3F2] hover:bg-[#E5E7E5] text-[#7C7C7C] h-12 pl-11 pr-4 rounded-2xl flex items-center text-sm font-medium cursor-pointer transition-colors"
+            className="w-full bg-[#F2F3F2] hover:bg-[#E5E7E5] text-[#7C7C7C] h-11 pl-11 pr-4 rounded-2xl flex items-center text-sm font-semibold cursor-pointer transition-colors overflow-hidden"
           >
-            <Search className="w-5 h-5 text-gray-500 absolute left-4" />
-            <span>Search store, fruits, beverages...</span>
+            <Search className="w-5 h-5 text-gray-500 absolute left-3.5 shrink-0" />
+            <span className="truncate whitespace-nowrap">Search store, fruits, beverages...</span>
           </div>
         </div>
 
@@ -136,11 +136,17 @@ export const NavbarDesktop: React.FC<NavbarDesktopProps> = ({
 
           {/* User Profile / Auth */}
           <button
-            onClick={onOpenAuth}
+            onClick={() => {
+              if (isAuthenticated) {
+                onTabChange('account');
+              } else {
+                onOpenAuth();
+              }
+            }}
             className="flex items-center space-x-2 bg-[#53B175]/10 hover:bg-[#53B175]/20 text-[#53B175] px-4 py-2.5 rounded-2xl font-bold text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#53B175]"
           >
             <User className="w-5 h-5" />
-            <span>{isAuthenticated ? userProfile?.name.split(' ')[0] : 'Log In'}</span>
+            <span>{isAuthenticated ? userProfile?.name.split(' ')[0] : 'Demo Log In'}</span>
           </button>
         </div>
       </div>

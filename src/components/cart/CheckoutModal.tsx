@@ -6,19 +6,13 @@ import {
   Truck,
   MapPin,
   Check,
-  Zap,
-  Clock,
-  ShieldCheck,
-  QrCode,
-  Banknote,
-  Wallet,
-  Receipt,
 } from 'lucide-react';
 import { BottomSheet } from '../common/BottomSheet';
 import { PillButton } from '../common/PillButton';
 import { useCartStore } from '../../stores/useCartStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useToastStore } from '../../stores/useToastStore';
+import { useOrderStore } from '../../stores/useOrderStore';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -49,10 +43,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onSuccess,
   onFailure,
 }) => {
-  const getSubtotal = useCartStore((state) => state.getSubtotal);
+  const { items, getSubtotal } = useCartStore();
   const clearCart = useCartStore((state) => state.clearCart);
   const { userLocation } = useAuthStore();
   const addToast = useToastStore((state) => state.addToast);
+  const addOrder = useOrderStore((state) => state.addOrder);
 
   const subtotal = getSubtotal();
 
@@ -79,7 +74,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   } else if (deliveryMethod === 'scheduled') {
     baseDeliveryFee = 0.5;
   } else {
-    // Express 15-20 min
     baseDeliveryFee = 2.0;
   }
 
@@ -87,13 +81,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     baseDeliveryFee = 0;
   }
 
-  // Handling & Packaging Fee
   const handlingFee = 0.49;
-
-  // Taxes (5%)
   const taxFee = Math.round(subtotal * 0.05 * 100) / 100;
 
-  // Promo Discount Calculation
   let discountAmount = 0;
   if (appliedPromo) {
     if (appliedPromo.type === 'percent') {
@@ -103,10 +93,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   }
 
-  // Grand Total
   const grandTotal = Math.max(0, subtotal + baseDeliveryFee + handlingFee + taxFee - discountAmount);
 
-  // Apply Promo Action
   const handleApplyPromoCode = (codeToApply: string) => {
     const matched = AVAILABLE_PROMOS.find(
       (p) => p.code.toUpperCase() === codeToApply.trim().toUpperCase()
@@ -115,30 +103,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     if (matched) {
       setAppliedPromo(matched);
       setPromoError('');
-      addToast(`Promo '${matched.code}' applied successfully! 🎉`, 'success');
+      addToast(`Promo '${matched.code}' applied! 🎉`, 'success');
       setShowPromoPicker(false);
     } else {
       setPromoError('Invalid code. Try NECTAR10 or FREESHIP');
     }
   };
 
-  const handlePlaceOrder = () => {
-    setIsProcessing(true);
-
-    setTimeout(() => {
-      setIsProcessing(false);
-      onClose();
-
-      if (simulateFailure) {
-        onFailure();
-      } else {
-        clearCart();
-        onSuccess();
-      }
-    }, 1200);
-  };
-
-  // Payment Label Renderer
   const getPaymentLabel = () => {
     switch (paymentMethod) {
       case 'upi_gpay':
@@ -152,419 +123,279 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       case 'cod':
         return '💵 Cash on Delivery';
       case 'wallet':
-        return '👛 Nectar Pay Wallet ($45.00)';
+        return '👛 Nectar Wallet';
     }
   };
 
-  // Delivery Label Renderer
   const getDeliveryLabel = () => {
     switch (deliveryMethod) {
       case 'express':
-        return `⚡ Express (15-20 m) - $${baseDeliveryFee.toFixed(2)}`;
+        return `⚡ Express (15-20m) • $${baseDeliveryFee.toFixed(2)}`;
       case 'standard':
-        return `🚚 Standard (45 m) - ${baseDeliveryFee === 0 ? 'FREE' : '$' + baseDeliveryFee.toFixed(2)}`;
+        return `🚚 Standard (45m) • ${baseDeliveryFee === 0 ? 'FREE' : '$' + baseDeliveryFee.toFixed(2)}`;
       case 'scheduled':
-        return `📅 Eco Slot (Tomorrow) - $${baseDeliveryFee.toFixed(2)}`;
+        return `📅 Eco Slot • $${baseDeliveryFee.toFixed(2)}`;
     }
+  };
+
+  const handlePlaceOrder = () => {
+    setIsProcessing(true);
+
+    setTimeout(() => {
+      setIsProcessing(false);
+      onClose();
+
+      if (simulateFailure) {
+        onFailure();
+      } else {
+        // Record Order into Order Store
+        addOrder({
+          items: items.map((i) => ({
+            id: i.product.id,
+            name: i.product.name,
+            unit: i.product.unit,
+            price: i.addedAtPrice,
+            quantity: i.quantity,
+            imageUrl: i.product.imageUrl,
+          })),
+          subtotal,
+          deliveryFee: baseDeliveryFee,
+          handlingFee,
+          taxFee,
+          discountAmount,
+          totalAmount: grandTotal,
+          paymentMethod: getPaymentLabel(),
+          deliveryAddress: `${userLocation.area}, ${userLocation.city}`,
+        });
+
+        clearCart();
+        onSuccess();
+      }
+    }, 1000);
   };
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title="Checkout">
-      <div className="flex flex-col h-full max-h-[80vh]">
-        {/* ── Scrollable Checkout Body ── */}
-        <div className="flex-1 overflow-y-auto space-y-4 pr-1 pb-4 scrollbar-thin">
-          
-          {/* Address Card */}
-          <div className="bg-[#EEF8F2]/60 border border-[#53B175]/30 rounded-2xl p-3.5 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-[#53B175] text-white flex items-center justify-center shrink-0 shadow-xs">
-                <MapPin className="w-5 h-5 stroke-[2.2]" />
-              </div>
-              <div>
-                <p className="text-[11px] font-extrabold text-[#53B175] uppercase tracking-wider">
-                  Delivering To
-                </p>
-                <p className="text-sm font-bold text-[#181725] leading-tight">
-                  {userLocation.area}, {userLocation.city}
-                </p>
-              </div>
-            </div>
-            <span className="text-xs font-bold text-[#53B175] bg-white px-2.5 py-1 rounded-xl shadow-2xs border border-[#53B175]/20">
-              Verified
+      <div className="flex flex-col justify-between space-y-3 overflow-hidden select-none">
+        
+        {/* Compact Address Row */}
+        <div className="bg-[#EEF8F2] border border-[#53B175]/30 rounded-xl px-3 py-2 flex items-center justify-between">
+          <div className="flex items-center space-x-2 truncate">
+            <MapPin className="w-4 h-4 text-[#53B175] shrink-0" />
+            <span className="text-xs font-extrabold text-[#181725] truncate">
+              {userLocation.area}, {userLocation.city}
             </span>
           </div>
+          <span className="text-[10px] font-extrabold text-[#53B175] bg-white px-2 py-0.5 rounded-full border border-[#53B175]/30 shrink-0">
+            Verified
+          </span>
+        </div>
 
-          {/* Interactive Options Table */}
-          <div className="divide-y divide-[#F2F3F2] border-y border-[#F2F3F2] bg-white rounded-2xl">
-            
-            {/* Delivery Option Trigger */}
+        {/* Options List */}
+        <div className="divide-y divide-[#F2F3F2] border-y border-[#F2F3F2] text-xs">
+          
+          {/* Delivery Speed Row */}
+          <div className="py-2.5 flex flex-col">
             <div
               onClick={() => setShowDeliveryPicker(!showDeliveryPicker)}
-              className="py-3.5 px-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-xl transition-colors"
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-1 py-1 rounded-lg"
             >
-              <div className="flex items-center space-x-3 text-[#7C7C7C] font-semibold text-sm">
-                <Truck className="w-5 h-5 text-gray-600" />
+              <div className="flex items-center space-x-2 text-[#7C7C7C]">
+                <Truck className="w-4 h-4 text-gray-600" />
                 <span className="text-[#181725] font-extrabold">Delivery Speed</span>
               </div>
-              <div className="flex items-center space-x-2 text-xs font-extrabold text-[#181725]">
-                <span className="text-[#53B175]">{getDeliveryLabel()}</span>
+              <div className="flex items-center space-x-1 font-bold text-[#53B175]">
+                <span>{getDeliveryLabel()}</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
 
-            {/* Delivery Picker Sub-Drawer */}
             {showDeliveryPicker && (
-              <div className="p-3 bg-[#F8F9FA] space-y-2 rounded-xl border border-gray-100">
-                <p className="text-xs font-extrabold text-[#7C7C7C] uppercase tracking-wider mb-1">
-                  Choose Delivery Speed:
-                </p>
-                
+              <div className="mt-2 p-2 bg-[#F8F9FA] rounded-xl space-y-1 border border-gray-200">
                 <button
                   type="button"
-                  onClick={() => {
-                    setDeliveryMethod('express');
-                    setShowDeliveryPicker(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                    deliveryMethod === 'express'
-                      ? 'bg-[#EEF8F2] border-[#53B175] text-[#53B175]'
-                      : 'bg-white border-gray-200 text-[#181725]'
+                  onClick={() => { setDeliveryMethod('express'); setShowDeliveryPicker(false); }}
+                  className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-bold ${
+                    deliveryMethod === 'express' ? 'bg-[#EEF8F2] text-[#53B175] border border-[#53B175]' : 'bg-white text-[#181725]'
                   }`}
                 >
-                  <div className="flex items-center space-x-2">
-                    <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
-                    <span>⚡ Express Instant (15-20 Mins)</span>
-                  </div>
+                  <span>⚡ Express (15-20 Mins)</span>
                   <span>$2.00</span>
                 </button>
-
                 <button
                   type="button"
-                  onClick={() => {
-                    setDeliveryMethod('standard');
-                    setShowDeliveryPicker(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                    deliveryMethod === 'standard'
-                      ? 'bg-[#EEF8F2] border-[#53B175] text-[#53B175]'
-                      : 'bg-white border-gray-200 text-[#181725]'
+                  onClick={() => { setDeliveryMethod('standard'); setShowDeliveryPicker(false); }}
+                  className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-bold ${
+                    deliveryMethod === 'standard' ? 'bg-[#EEF8F2] text-[#53B175] border border-[#53B175]' : 'bg-white text-[#181725]'
                   }`}
                 >
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-blue-500" />
-                    <span>🚚 Standard Delivery (45 Mins)</span>
-                  </div>
+                  <span>🚚 Standard (45 Mins)</span>
                   <span>{subtotal >= 15 ? 'FREE' : '$1.00'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDeliveryMethod('scheduled');
-                    setShowDeliveryPicker(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                    deliveryMethod === 'scheduled'
-                      ? 'bg-[#EEF8F2] border-[#53B175] text-[#53B175]'
-                      : 'bg-white border-gray-200 text-[#181725]'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <ShieldCheck className="w-4 h-4 text-purple-500" />
-                    <span>📅 Scheduled Slot (Tomorrow Morning)</span>
-                  </div>
-                  <span>$0.50</span>
                 </button>
               </div>
             )}
+          </div>
 
-            {/* Payment Method Trigger */}
+          {/* Payment Method Row */}
+          <div className="py-2.5 flex flex-col">
             <div
               onClick={() => setShowPaymentPicker(!showPaymentPicker)}
-              className="py-3.5 px-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-xl transition-colors"
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-1 py-1 rounded-lg"
             >
-              <div className="flex items-center space-x-3 text-[#7C7C7C] font-semibold text-sm">
-                <CreditCard className="w-5 h-5 text-gray-600" />
+              <div className="flex items-center space-x-2 text-[#7C7C7C]">
+                <CreditCard className="w-4 h-4 text-gray-600" />
                 <span className="text-[#181725] font-extrabold">Payment Method</span>
               </div>
-              <div className="flex items-center space-x-2 text-xs font-extrabold text-[#181725]">
+              <div className="flex items-center space-x-1 font-bold text-[#181725]">
                 <span>{getPaymentLabel()}</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
 
-            {/* Payment Picker Sub-Drawer */}
             {showPaymentPicker && (
-              <div className="p-3 bg-[#F8F9FA] space-y-2 rounded-xl border border-gray-100">
-                <p className="text-xs font-extrabold text-[#7C7C7C] uppercase tracking-wider mb-1">
-                  Select Payment Option:
-                </p>
-
-                {/* Google Pay / UPI */}
+              <div className="mt-2 p-2 bg-[#F8F9FA] rounded-xl space-y-1 border border-gray-200">
                 <button
                   type="button"
-                  onClick={() => {
-                    setPaymentMethod('upi_gpay');
-                    setShowPaymentPicker(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                    paymentMethod === 'upi_gpay'
-                      ? 'bg-[#EEF8F2] border-[#53B175] text-[#53B175]'
-                      : 'bg-white border-gray-200 text-[#181725]'
-                  }`}
+                  onClick={() => { setPaymentMethod('upi_gpay'); setShowPaymentPicker(false); }}
+                  className="w-full flex items-center justify-between p-2 bg-white rounded-lg text-xs font-bold text-[#181725] hover:bg-gray-100"
                 >
-                  <div className="flex items-center space-x-2">
-                    <QrCode className="w-4 h-4 text-blue-600" />
-                    <span>📱 Google Pay / UPI</span>
-                  </div>
-                  {paymentMethod === 'upi_gpay' && <Check className="w-4 h-4 stroke-[3]" />}
+                  <span>📱 Google Pay / UPI</span>
+                  {paymentMethod === 'upi_gpay' && <Check className="w-4 h-4 text-[#53B175]" />}
                 </button>
-
-                {/* PhonePe */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setPaymentMethod('upi_phonepe');
-                    setShowPaymentPicker(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                    paymentMethod === 'upi_phonepe'
-                      ? 'bg-[#EEF8F2] border-[#53B175] text-[#53B175]'
-                      : 'bg-white border-gray-200 text-[#181725]'
-                  }`}
+                  onClick={() => { setPaymentMethod('upi_phonepe'); setShowPaymentPicker(false); }}
+                  className="w-full flex items-center justify-between p-2 bg-white rounded-lg text-xs font-bold text-[#181725] hover:bg-gray-100"
                 >
-                  <div className="flex items-center space-x-2">
-                    <QrCode className="w-4 h-4 text-purple-600" />
-                    <span>💜 PhonePe / BHIM UPI</span>
-                  </div>
-                  {paymentMethod === 'upi_phonepe' && <Check className="w-4 h-4 stroke-[3]" />}
+                  <span>💜 PhonePe / BHIM UPI</span>
+                  {paymentMethod === 'upi_phonepe' && <Check className="w-4 h-4 text-[#53B175]" />}
                 </button>
-
-                {/* Visa Card */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setPaymentMethod('card_visa');
-                    setShowPaymentPicker(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                    paymentMethod === 'card_visa'
-                      ? 'bg-[#EEF8F2] border-[#53B175] text-[#53B175]'
-                      : 'bg-white border-gray-200 text-[#181725]'
-                  }`}
+                  onClick={() => { setPaymentMethod('card_visa'); setShowPaymentPicker(false); }}
+                  className="w-full flex items-center justify-between p-2 bg-white rounded-lg text-xs font-bold text-[#181725] hover:bg-gray-100"
                 >
-                  <div className="flex items-center space-x-2">
-                    <CreditCard className="w-4 h-4 text-indigo-600" />
-                    <span>💳 Visa Card ending in 4242</span>
-                  </div>
-                  {paymentMethod === 'card_visa' && <Check className="w-4 h-4 stroke-[3]" />}
+                  <span>💳 Visa **** 4242</span>
+                  {paymentMethod === 'card_visa' && <Check className="w-4 h-4 text-[#53B175]" />}
                 </button>
-
-                {/* Cash on Delivery */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setPaymentMethod('cod');
-                    setShowPaymentPicker(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                    paymentMethod === 'cod'
-                      ? 'bg-[#EEF8F2] border-[#53B175] text-[#53B175]'
-                      : 'bg-white border-gray-200 text-[#181725]'
-                  }`}
+                  onClick={() => { setPaymentMethod('cod'); setShowPaymentPicker(false); }}
+                  className="w-full flex items-center justify-between p-2 bg-white rounded-lg text-xs font-bold text-[#181725] hover:bg-gray-100"
                 >
-                  <div className="flex items-center space-x-2">
-                    <Banknote className="w-4 h-4 text-emerald-600" />
-                    <span>💵 Cash on Delivery (COD)</span>
-                  </div>
-                  {paymentMethod === 'cod' && <Check className="w-4 h-4 stroke-[3]" />}
-                </button>
-
-                {/* Nectar Wallet */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentMethod('wallet');
-                    setShowPaymentPicker(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all ${
-                    paymentMethod === 'wallet'
-                      ? 'bg-[#EEF8F2] border-[#53B175] text-[#53B175]'
-                      : 'bg-white border-gray-200 text-[#181725]'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <Wallet className="w-4 h-4 text-amber-600" />
-                    <span>👛 Nectar Wallet ($45.00 Balance)</span>
-                  </div>
-                  {paymentMethod === 'wallet' && <Check className="w-4 h-4 stroke-[3]" />}
+                  <span>💵 Cash on Delivery</span>
+                  {paymentMethod === 'cod' && <Check className="w-4 h-4 text-[#53B175]" />}
                 </button>
               </div>
             )}
+          </div>
 
-            {/* Promo Code Trigger */}
+          {/* Promo Code Row */}
+          <div className="py-2.5 flex flex-col">
             <div
               onClick={() => setShowPromoPicker(!showPromoPicker)}
-              className="py-3.5 px-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-xl transition-colors"
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-1 py-1 rounded-lg"
             >
-              <div className="flex items-center space-x-3 text-[#7C7C7C] font-semibold text-sm">
-                <Tag className="w-5 h-5 text-gray-600" />
-                <span className="text-[#181725] font-extrabold">Promo Discount</span>
+              <div className="flex items-center space-x-2 text-[#7C7C7C]">
+                <Tag className="w-4 h-4 text-gray-600" />
+                <span className="text-[#181725] font-extrabold">Promo Code</span>
               </div>
-              <div className="flex items-center space-x-2 text-xs font-extrabold text-[#181725]">
+              <div className="flex items-center space-x-1 font-bold text-[#181725]">
                 {appliedPromo ? (
-                  <span className="bg-[#EEF8F2] text-[#53B175] px-2.5 py-0.5 rounded-full border border-[#53B175]/30">
+                  <span className="text-[#53B175] bg-[#EEF8F2] px-2 py-0.5 rounded-md text-[11px]">
                     🏷️ {appliedPromo.code} (-${discountAmount.toFixed(2)})
                   </span>
                 ) : (
-                  <span className="text-gray-400 font-medium">Pick discount offer</span>
+                  <span className="text-gray-400 font-normal">Pick discount offer</span>
                 )}
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
 
-            {/* Promo Code Drawer */}
             {showPromoPicker && (
-              <div className="p-3 bg-[#F8F9FA] space-y-3 rounded-xl border border-gray-100">
-                {/* Code input form */}
-                <div className="flex items-center space-x-2">
+              <div className="mt-2 p-2 bg-[#F8F9FA] rounded-xl space-y-2 border border-gray-200">
+                <div className="flex space-x-1">
                   <input
                     type="text"
                     value={promoInput}
                     onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-                    placeholder="Enter Code (e.g. NECTAR10)"
-                    className="flex-1 bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-bold text-[#181725] uppercase outline-none focus:border-[#53B175]"
+                    placeholder="ENTER CODE (NECTAR10)"
+                    className="flex-1 px-2 py-1 bg-white border rounded text-xs uppercase font-bold"
                   />
                   <button
                     type="button"
                     onClick={() => handleApplyPromoCode(promoInput)}
-                    className="bg-[#53B175] text-white px-4 py-2 rounded-xl text-xs font-extrabold hover:bg-[#439c63] transition-colors"
+                    className="bg-[#53B175] text-white px-3 py-1 rounded text-xs font-bold"
                   >
                     Apply
                   </button>
                 </div>
-
-                {promoError && <p className="text-[11px] font-bold text-red-500">{promoError}</p>}
-
-                <p className="text-[11px] font-extrabold text-[#7C7C7C] uppercase tracking-wider">
-                  Available Offers:
-                </p>
-                <div className="space-y-1.5">
+                {promoError && <p className="text-[10px] text-red-500 font-bold">{promoError}</p>}
+                <div className="flex gap-1 flex-wrap pt-1">
                   {AVAILABLE_PROMOS.map((p) => (
-                    <div
+                    <button
                       key={p.code}
+                      type="button"
                       onClick={() => handleApplyPromoCode(p.code)}
-                      className="flex items-center justify-between p-2 rounded-xl bg-white border border-gray-200 cursor-pointer hover:border-[#53B175] transition-colors"
+                      className="bg-white border text-[#53B175] px-2 py-0.5 rounded text-[10px] font-extrabold hover:bg-[#EEF8F2]"
                     >
-                      <div>
-                        <span className="text-xs font-extrabold text-[#53B175] bg-[#EEF8F2] px-2 py-0.5 rounded-md">
-                          {p.code}
-                        </span>
-                        <span className="text-xs font-medium text-[#181725] ml-2">
-                          {p.description}
-                        </span>
-                      </div>
-                      <span className="text-[11px] font-bold text-[#53B175]">Apply</span>
-                    </div>
+                      {p.code}
+                    </button>
                   ))}
                 </div>
-
-                {appliedPromo && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAppliedPromo(null);
-                      addToast('Promo code removed', 'info');
-                    }}
-                    className="text-xs font-bold text-red-500 hover:underline pt-1 block"
-                  >
-                    Remove Applied Promo
-                  </button>
-                )}
               </div>
             )}
           </div>
-
-          {/* ── Transparent Charges Breakdown ── */}
-          <div className="bg-[#F8F9FA] rounded-2xl p-4 space-y-2 border border-gray-200">
-            <div className="flex items-center space-x-2 border-b border-gray-200 pb-2 mb-1">
-              <Receipt className="w-4 h-4 text-[#53B175]" />
-              <h4 className="text-xs font-extrabold text-[#181725] uppercase tracking-wider">
-                Bill Summary
-              </h4>
-            </div>
-
-            <div className="flex items-center justify-between text-xs font-medium text-[#7C7C7C]">
-              <span>Items Subtotal</span>
-              <span className="font-bold text-[#181725]">${subtotal.toFixed(2)}</span>
-            </div>
-
-            <div className="flex items-center justify-between text-xs font-medium text-[#7C7C7C]">
-              <span>Delivery Fee ({deliveryMethod})</span>
-              <span className="font-bold text-[#181725]">
-                {baseDeliveryFee === 0 ? (
-                  <span className="text-[#53B175] font-extrabold">FREE</span>
-                ) : (
-                  `$${baseDeliveryFee.toFixed(2)}`
-                )}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between text-xs font-medium text-[#7C7C7C]">
-              <span>Handling & Eco Packaging</span>
-              <span className="font-bold text-[#181725]">${handlingFee.toFixed(2)}</span>
-            </div>
-
-            <div className="flex items-center justify-between text-xs font-medium text-[#7C7C7C]">
-              <span>Govt Taxes & GST (5%)</span>
-              <span className="font-bold text-[#181725]">${taxFee.toFixed(2)}</span>
-            </div>
-
-            {discountAmount > 0 && (
-              <div className="flex items-center justify-between text-xs font-bold text-[#53B175]">
-                <span>Promo Discount ({appliedPromo?.code})</span>
-                <span>-${discountAmount.toFixed(2)}</span>
-              </div>
-            )}
-
-            <div className="pt-2 border-t border-gray-200 flex items-center justify-between text-base font-extrabold text-[#181725]">
-              <span>Grand Total</span>
-              <span className="text-[#53B175] text-xl font-extrabold">
-                ${grandTotal.toFixed(2)}
-              </span>
-            </div>
-          </div>
-
-          {/* Clean Simulator Mode Box */}
-          <div className="bg-amber-50/70 border border-amber-200/80 p-3 rounded-2xl flex items-center justify-between text-xs">
-            <span className="font-extrabold text-amber-900 flex items-center gap-1.5">
-              <span>⚡ Simulation State:</span>
-              <span className={simulateFailure ? 'text-red-600' : 'text-emerald-700'}>
-                {simulateFailure ? 'Fail Order (Error Test)' : 'Success Order (Normal)'}
-              </span>
-            </span>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={simulateFailure}
-                onChange={(e) => setSimulateFailure(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-9 h-5 bg-emerald-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-500" />
-            </label>
-          </div>
-
-          {/* Legal Terms */}
-          <p className="text-[11px] text-[#7C7C7C] leading-snug text-center">
-            By placing an order you agree to our{' '}
-            <span className="text-[#53B175] font-semibold cursor-pointer underline">
-              Terms & Conditions
-            </span>
-          </p>
         </div>
 
-        {/* ── Sticky Bottom Action Bar ── */}
-        <div className="pt-3 border-t border-[#F2F3F2] shrink-0 bg-white z-10">
+        {/* Compact Bill Summary Box */}
+        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-200 text-xs">
+          <div className="flex items-center justify-between text-[#7C7C7C] font-semibold">
+            <span>Items Subtotal</span>
+            <span className="text-[#181725] font-extrabold">${subtotal.toFixed(2)}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-[#7C7C7C] font-semibold">
+            <span>Delivery Fee ({deliveryMethod})</span>
+            <span className="text-[#181725] font-extrabold">
+              {baseDeliveryFee === 0 ? 'FREE' : `$${baseDeliveryFee.toFixed(2)}`}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between text-[#7C7C7C] font-semibold">
+            <span>Packaging & GST (5%)</span>
+            <span className="text-[#181725] font-extrabold">${(handlingFee + taxFee).toFixed(2)}</span>
+          </div>
+
+          {discountAmount > 0 && (
+            <div className="flex items-center justify-between text-[#53B175] font-bold">
+              <span>Promo Discount</span>
+              <span>-${discountAmount.toFixed(2)}</span>
+            </div>
+          )}
+
+          <div className="pt-1.5 border-t border-gray-200 flex items-center justify-between text-sm font-extrabold text-[#181725]">
+            <span>Grand Total</span>
+            <span className="text-[#53B175] text-base font-extrabold">${grandTotal.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* Discreet Simulation Switch */}
+        <div className="flex items-center justify-between px-1 text-[11px] text-gray-500">
+          <span className="font-semibold">
+            Simulation Test: {simulateFailure ? '🔴 Fail Mode' : '🟢 Success Mode'}
+          </span>
+          <button
+            type="button"
+            onClick={() => setSimulateFailure(!simulateFailure)}
+            className="text-[10px] font-bold text-[#53B175] underline hover:text-[#439c63]"
+          >
+            Toggle Mode
+          </button>
+        </div>
+
+        {/* Action Button */}
+        <div className="pt-1">
           <PillButton onClick={handlePlaceOrder} isLoading={isProcessing}>
             Place Order • ${grandTotal.toFixed(2)}
           </PillButton>
