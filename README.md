@@ -4,12 +4,12 @@
 
   # **Nectar — Production-Grade Online Grocery Platform**
 
-  [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.6.3%20Strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![React](https://img.shields.io/badge/React-19.2.8-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2%20Strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
   [![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4.0-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-  [![Zustand](https://img.shields.io/badge/State-Zustand%20v4-764ABC?logo=redux&logoColor=white)](https://zustand-demo.pmnd.rs/)
-  [![React Router](https://img.shields.io/badge/Router-React%20Router%20v6-CA4245?logo=reactrouter&logoColor=white)](https://reactrouter.com/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4.3.3-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+  [![Zustand](https://img.shields.io/badge/State-Zustand%20v5.0-764ABC?logo=redux&logoColor=white)](https://zustand-demo.pmnd.rs/)
+  [![React Router](https://img.shields.io/badge/Router-React%20Router%20v7.18-CA4245?logo=reactrouter&logoColor=white)](https://reactrouter.com/)
   [![Vercel Live Demo](https://img.shields.io/badge/Vercel-Live%20Demo-000000?logo=vercel&logoColor=white)](https://nectar-grocery-flax.vercel.app)
   [![Build Status](https://img.shields.io/badge/Build-Passing-53B175)](https://github.com/Neerav02/Nectar-Grocery)
 
@@ -126,13 +126,13 @@ flowchart TD
 ## 🛠️ Technology Stack & Dependencies
 
 ### Core Frameworks & Tooling
-- **Core Library**: React 18.3.1
-- **Router Engine**: React Router v6 (`react-router-dom` v6.28)
+- **Core Library**: React 19.2.8
+- **Router Engine**: React Router v7 (`react-router-dom` v7.18.2)
 - **Build Engine**: Vite 8.2.2 (Ultra-fast HMR and optimized production bundle)
-- **Language**: TypeScript 5.6.3 Strict Mode (100% type safety, zero `any`)
-- **Styling**: Tailwind CSS v4 + Custom Vanilla CSS (Design system, custom scrollbars, animations)
-- **State Engine**: Zustand v4 + `persist` middleware
-- **Icons**: Lucide React
+- **Language**: TypeScript 6.0.2 Strict Mode (100% type safety, zero `any`)
+- **Styling**: Tailwind CSS v4.3.3 + Custom Vanilla CSS (Design system, custom scrollbars, animations)
+- **State Engine**: Zustand v5.0.15 + `persist` middleware
+- **Icons**: Lucide React v1.34.0
 
 ---
 
