@@ -50,6 +50,12 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onOpenAuth, initialSec
   const [activeSection, setActiveSection] = useState<SectionType>(
     (initialSection as SectionType) || 'menu'
   );
+
+  React.useEffect(() => {
+    if (initialSection) {
+      setActiveSection(initialSection as SectionType);
+    }
+  }, [initialSection]);
   const [selectedOrder, setSelectedOrder] = useState<OrderRecord | null>(
     activeOrder || orders[0] || null
   );

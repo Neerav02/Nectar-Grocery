@@ -71,10 +71,15 @@ export function App() {
   const handleCompleteAuthSequence = () => {
     login('user@nectar.com', 'Demo Customer');
     setCompletedOnboarding(true);
+    setAccountSection('menu');
+    setActiveTab('account');
     setCurrentStep('main_app');
   };
 
   const handleTabChange = (tab: TabType) => {
+    if (tab === 'account') {
+      setAccountSection('menu');
+    }
     setActiveTab(tab);
     setSelectedCategory(null);
     setSelectedProduct(null);
