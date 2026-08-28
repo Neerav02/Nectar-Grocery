@@ -30,7 +30,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
     return () => clearTimeout(timer);
   }, [query, executeSearch]);
 
-  // Apply local brand/category filter on results
+  // Apply all filter criteria on results
   let filteredResults = results;
   if (appliedFilters.brands.length > 0) {
     filteredResults = filteredResults.filter((p) => appliedFilters.brands.includes(p.brand));
@@ -40,6 +40,32 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
       appliedFilters.categories.includes(p.categoryId)
     );
   }
+  if (appliedFilters.dietary.length > 0) {
+    if (appliedFilters.dietary.includes('Organic Certified')) {
+      filteredResults = filteredResults.filter((p) => p.nutritionInfo?.organic);
+    }
+  }
+  if (appliedFilters.minRating > 0) {
+    filteredResults = filteredResults.filter((p) => p.rating >= appliedFilters.minRating);
+  }
+  if (appliedFilters.priceRanges.length > 0) {
+    filteredResults = filteredResults.filter((p) =>
+      appliedFilters.priceRanges.some((range) => {
+        if (range === 'under_2') return p.price < 2;
+        if (range === '2_to_5') return p.price >= 2 && p.price <= 5;
+        if (range === '5_to_10') return p.price > 5 && p.price <= 10;
+        if (range === 'above_10') return p.price > 10;
+        return true;
+      })
+    );
+  }
+
+  const hasActiveFilters =
+    appliedFilters.brands.length > 0 ||
+    appliedFilters.categories.length > 0 ||
+    appliedFilters.priceRanges.length > 0 ||
+    appliedFilters.dietary.length > 0 ||
+    appliedFilters.minRating > 0;
 
   return (
     <div className="space-y-6 pb-24 md:pb-12 animate-fade-in">
@@ -76,7 +102,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
           className="p-3 bg-[#F2F3F2] hover:bg-[#E5E7E5] rounded-2xl text-[#181725] transition-colors focus-visible:ring-2 focus-visible:ring-[#53B175] relative shrink-0"
         >
           <SlidersHorizontal className="w-6 h-6" />
-          {(appliedFilters.brands.length > 0 || appliedFilters.categories.length > 0) && (
+          {hasActiveFilters && (
             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#53B175] rounded-full" />
           )}
         </button>

@@ -41,6 +41,9 @@ export interface CartItem {
 export interface FilterState {
   categories: string[];
   brands: string[];
+  priceRanges: string[];
+  dietary: string[];
+  minRating: number;
 }
 
 export interface UserLocation {
