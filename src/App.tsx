@@ -162,7 +162,7 @@ export function App() {
 
   // 9. Main Application View
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-[#181725] flex flex-col font-sans selection:bg-[#53B175]/30">
+    <div className="min-h-screen bg-white text-[#181725] flex flex-col font-sans selection:bg-[#53B175]/30">
       {/* Desktop Header Navbar */}
       <NavbarDesktop
         activeTab={activeTab}

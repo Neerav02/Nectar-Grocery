@@ -7,37 +7,48 @@ interface CarrotLogoProps {
 
 export const CarrotLogo: React.FC<CarrotLogoProps> = ({
   variant = 'color',
-  className = 'w-8 h-9',
+  className = 'w-9 h-10',
 }) => {
   const isColor = variant === 'color';
 
   const leafColor = isColor ? '#53B175' : '#FFFFFF';
-  const bodyColor = isColor ? '#F3603F' : '#FFFFFF';
+  const bodyColor = isColor ? '#FF5533' : '#FFFFFF';
   const cutColor = isColor ? '#FFFFFF' : '#53B175';
 
   return (
     <svg
-      viewBox="0 0 54 54"
+      viewBox="0 0 100 100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      {/* Leaf Top Cluster (Green #53B175) */}
+      {/* 3 Top Green Leaves */}
       <g fill={leafColor}>
-        <path d="M22.5 14.2C20.1 9.8 22.4 4.5 27.2 3.2C31.5 2.0 35.8 4.6 36.6 9.1C38.4 6.8 42.1 6.2 44.8 8.0C47.6 9.9 48.4 13.7 46.6 16.5C48.9 18.2 49.5 21.8 48.0 24.3C46.3 27.0 42.6 27.7 39.8 25.8C35.5 23.0 27.8 19.5 22.5 14.2Z" />
+        <rect x="55" y="8" width="15" height="32" rx="7.5" transform="rotate(-15 55 8)" />
+        <rect x="68" y="14" width="15" height="32" rx="7.5" transform="rotate(18 68 14)" />
+        <rect x="76" y="27" width="15" height="30" rx="7.5" transform="rotate(52 76 27)" />
       </g>
 
-      {/* Carrot Body (Orange #F3603F) */}
+      {/* Orange Carrot Body */}
       <path
-        d="M40.2 21.4C44.5 26.2 44.1 32.5 38.6 37.8L21.4 50.8C18.8 52.8 15.0 52.3 12.9 49.6L4.8 39.2C2.7 36.5 3.1 32.7 5.7 30.7L22.9 17.7C28.4 12.4 35.8 16.5 40.2 21.4Z"
+        d="M 72 37
+           C 74 41, 71 49, 61 57
+           L 26 84
+           C 23 86, 20 84, 21 81
+           L 38 48
+           C 44 38, 54 30, 64 32
+           C 69 33, 71 35, 72 37 Z"
         fill={bodyColor}
       />
 
-      {/* White Cut Accents on Left Edge */}
+      {/* 4 Notch Cuts (2 on left, 2 on right) */}
       <path
-        d="M13.2 36.8L21.8 30.3M10.1 43.1L16.7 38.1"
+        d="M 33 53 L 47 48
+           M 27 67 L 39 62
+           M 67 48 L 57 53
+           M 56 62 L 48 66"
         stroke={cutColor}
-        strokeWidth="3.2"
+        strokeWidth="4"
         strokeLinecap="round"
       />
     </svg>
