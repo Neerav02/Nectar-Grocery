@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Check, Sparkles, LogIn, PhoneCall } from 'lucide-react';
+import { Eye, EyeOff, Check, LogIn, PhoneCall } from 'lucide-react';
+import { CarrotLogo } from '../common/CarrotLogo';
 import { BottomSheet } from '../common/BottomSheet';
 import { PillButton } from '../common/PillButton';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -55,9 +56,7 @@ export const AuthModal: React.FC = () => {
         <div className="py-2">
           {/* Header Lockup */}
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-[#53B175] flex items-center justify-center text-white mb-3 shadow-xs">
-              <Sparkles className="w-7 h-7 fill-white stroke-none" />
-            </div>
+            <CarrotLogo variant="color" className="w-10 h-12 mb-3" />
             <h3 className="text-2xl font-extrabold text-[#181725]">
               {mode === 'login' ? 'Log In' : mode === 'signup' ? 'Sign Up' : 'Enter your mobile number'}
             </h3>
