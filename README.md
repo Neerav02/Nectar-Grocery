@@ -11,16 +11,18 @@ A pixel-faithful, production-ready, mobile-first and desktop-adapted online groc
 
 ---
 
-## 🖼️ Visual Interface & Feature Showcase
+## 📸 Built Application Visual Showcase
 
-| Screen | Preview | Description |
+Below are actual screenshots captured directly from our running Nectar React Web Application:
+
+| Application Feature | Live App Preview | Highlights & Capabilities |
 | :--- | :---: | :--- |
-| **Home Shop** | <img src="public/design-references/Home%20Screen.png" width="220" alt="Home Screen"/> | Auto-rotating hero banners, exclusive offers slider, best sellers grid, live order counter. |
-| **Explore Categories** | <img src="public/design-references/Explore.png" width="220" alt="Explore Screen"/> | 2-column pastel category tiles with custom hue borders and instant filter triggers. |
-| **Search & Filtering** | <img src="public/design-references/Search.png" width="220" alt="Search Screen"/> | Instant debounced search with removable active filter badges and draft filter drawer. |
-| **Product Detail** | <img src="public/design-references/Product%20Detail.png" width="220" alt="Product Detail"/> | Photo stage, unit price calculator, quantity stepper, expandable nutritional facts accordion. |
-| **Cart & Checkout** | <img src="public/design-references/My%20Cart.png" width="220" alt="My Cart Screen"/> | Itemized cart list, swipe-to-delete, sticky subtotal, single-card checkout modal (`maxWidth="xl"`). |
-| **Order Tracking** | <img src="public/design-references/order%20accepted.png" width="220" alt="Order Success Screen"/> | Order success celebration, live 4-step progress stepper, delivery partner dispatch. |
+| **Main Shop Page** | <img src="public/screenshots/app_home.png" width="300" alt="Live Application Home Screen"/> | Enlarged Nectar logo lockup, sticky desktop navbar, auto-rotating hero banners ("Shop Vegetables", "Shop Fruits", "Shop Dairy"), live order counter, exclusive offers grid. |
+| **Search & Active Filters** | <img src="public/screenshots/app_search_filters.png" width="300" alt="Live Search & Filter Badges"/> | Real-time search bar, removable active filter badges (`[ Category ✕ ]`, `[ Price ✕ ]`, `[ Reset All ]`), filtered product grid, interactive Stale Search Debug Panel. |
+| **Single-Card Checkout Modal** | <img src="public/screenshots/app_checkout_card.png" width="300" alt="Live Single Card Checkout Modal"/> | Expanded `maxWidth="xl"` scroll-free card, verified delivery address, express vs standard delivery selection, payment options (UPI, GPay, PhonePe, Card, COD), itemized charges, GST 5%, grand total. |
+| **Profile & Live Order Tracking** | <img src="public/screenshots/app_order_tracking.png" width="300" alt="Live Order Tracking & Profile"/> | User profile header, live 4-step progress stepper (**Order Placed ➔ Packing ➔ Out for Delivery ➔ Delivered**) with automated 12s status timer and delivery partner details (Ramesh Kumar). |
+| **Product Detail View** | <img src="public/screenshots/app_product_detail.png" width="300" alt="Live Product Detail Page"/> | Product image stage, price per unit, weight selector, quantity counter, expandable nutritional facts accordion, sticky add to basket button. |
+| **Cart & Itemized Summary** | <img src="public/screenshots/app_cart.png" width="300" alt="Live Cart Page"/> | Line items with steppers, price updates, swipe-to-delete, sticky subtotal summary bar. |
 
 ---
 
@@ -189,6 +191,7 @@ flowchart TD
 ```
 nectar-grocery-app/
 ├── public/
+│   ├── screenshots/           # Live application screenshots showcase
 │   ├── design-references/     # Original Figma reference screenshots (28 screens)
 │   ├── images/                # High-definition grocery product & banner assets
 │   └── favicon.ico
