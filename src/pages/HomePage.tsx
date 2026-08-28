@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin } from 'lucide-react';
-import { CarrotLogo } from '../components/common/CarrotLogo';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { ProductGrid } from '../components/product/ProductGrid';
 import { Product, Category, TabType } from '../types';
@@ -60,7 +59,13 @@ export const HomePage: React.FC<HomePageProps> = ({
     <div className="space-y-6 pb-24 md:pb-12 animate-fade-in">
       {/* Mobile Top Header (Carrot Icon + Location) */}
       <div className="md:hidden flex flex-col items-center pt-2">
-        <CarrotLogo variant="color" className="w-8 h-9 mb-2" />
+        <div className="bg-white p-1 rounded-xl shadow-xs mb-2">
+          <img
+            src="/images/ICON_1.png"
+            alt="Nectar Logo"
+            className="w-8 h-9 object-contain"
+          />
+        </div>
         <button
           type="button"
           onClick={onOpenLocation}
