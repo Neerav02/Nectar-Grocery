@@ -72,7 +72,7 @@ export function App() {
     login('user@nectar.com', 'Demo Customer');
     setCompletedOnboarding(true);
     setAccountSection('menu');
-    setActiveTab('account');
+    setActiveTab('shop');
     setCurrentStep('main_app');
   };
 
@@ -160,6 +160,8 @@ export function App() {
         onBack={() => setCurrentStep('signin_welcome')}
         onSuccess={(email) => {
           login(email, 'Imran Hossain');
+          setAccountSection('menu');
+          setActiveTab('shop');
           setCurrentStep('main_app');
         }}
         onGoToSignUp={() => setCurrentStep('signup_email')}
@@ -174,6 +176,8 @@ export function App() {
         onBack={() => setCurrentStep('login_email')}
         onSuccess={(name, email) => {
           login(email, name);
+          setAccountSection('menu');
+          setActiveTab('shop');
           setCurrentStep('main_app');
         }}
         onGoToLogIn={() => setCurrentStep('login_email')}
