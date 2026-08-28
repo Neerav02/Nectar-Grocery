@@ -210,7 +210,10 @@ export function App() {
               onOpenLocation={() => setIsLocationOpen(true)}
             />
           ) : activeTab === 'explore' ? (
-            <SearchPage onSelectProduct={setSelectedProduct} />
+            <SearchPage
+              onSelectProduct={setSelectedProduct}
+              onSelectCategory={setSelectedCategory}
+            />
           ) : activeTab === 'cart' ? (
             <CartPage
               onGoToCheckout={handleCheckoutClick}

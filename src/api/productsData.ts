@@ -39,7 +39,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     fillBg: '#FEF8E5',
     borderColor: '#FDE598',
     iconName: 'Egg',
-    imageUrl: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=600&h=450&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=600&h=450&q=80',
   },
   {
     id: 'beverages',
@@ -48,6 +48,22 @@ export const INITIAL_CATEGORIES: Category[] = [
     borderColor: '#B7DFF5',
     iconName: 'CupSoda',
     imageUrl: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&h=450&q=80',
+  },
+  {
+    id: 'fast-food',
+    name: 'Fast Food & Munchies',
+    fillBg: '#FDF2F8',
+    borderColor: '#F472B6',
+    iconName: 'Pizza',
+    imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&h=450&q=80',
+  },
+  {
+    id: 'staples-spices',
+    name: 'Spices & Staples',
+    fillBg: '#FFFBEB',
+    borderColor: '#F59E0B',
+    iconName: 'Package',
+    imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&h=450&q=80',
   },
 ];
 
