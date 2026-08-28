@@ -16,12 +16,12 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({ item }) => {
 
   return (
     <div className="py-4 border-b border-[#F2F3F2] flex items-center justify-between gap-4 transition-colors hover:bg-gray-50/50 rounded-xl px-2">
-      {/* Product Image */}
-      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#F8F9FA] rounded-xl flex items-center justify-center p-2 shrink-0 border border-[#E2E2E2]">
+      {/* Product Image Stage */}
+      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#F4F5F4] rounded-xl overflow-hidden shrink-0 border border-[#E2E2E2]">
         <img
           src={product.imageUrl}
           alt={product.name}
-          className="max-h-full max-w-full object-contain"
+          className="w-full h-full object-cover"
         />
       </div>
 

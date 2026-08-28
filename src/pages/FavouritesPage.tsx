@@ -27,8 +27,8 @@ export const FavouritesPage: React.FC<FavouritesPageProps> = ({ onSelectProduct,
   };
 
   return (
-    <div className="space-y-6 pb-28 md:pb-12 animate-fade-in">
-      <h1 className="text-2xl font-extrabold text-[#181725] text-center tracking-tight pb-2 border-b border-[#F2F3F2]">
+    <div className="max-w-2xl mx-auto space-y-6 pb-28 md:pb-12 animate-fade-in">
+      <h1 className="text-2xl font-extrabold text-[#181725] text-center tracking-tight pb-3 border-b border-[#F2F3F2]">
         Favourite
       </h1>
 
@@ -40,52 +40,61 @@ export const FavouritesPage: React.FC<FavouritesPageProps> = ({ onSelectProduct,
           onAction={onExplore}
         />
       ) : (
-        <div className="space-y-1">
-          <div className="divide-y divide-[#F2F3F2]">
+        <div className="space-y-6">
+          <div className="bg-white rounded-3xl p-2 sm:p-4 shadow-2xs border border-[#F2F3F2] divide-y divide-[#F2F3F2]">
             {favoriteProducts.map((product) => (
               <div
                 key={product.id}
                 onClick={() => onSelectProduct(product)}
-                className="py-4 flex items-center justify-between gap-4 cursor-pointer hover:bg-gray-50/80 px-2 rounded-xl transition-colors group"
+                className="py-4 flex items-center justify-between gap-4 cursor-pointer hover:bg-gray-50/80 px-3 rounded-2xl transition-colors group"
               >
-                {/* Thumbnail */}
-                <div className="w-16 h-16 bg-[#F8F9FA] rounded-xl flex items-center justify-center p-2 border border-[#E2E2E2] shrink-0">
+                {/* Full-bleed cover thumbnail */}
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#F4F5F4] rounded-xl overflow-hidden border border-[#E2E2E2] shrink-0">
                   <img
                     src={product.imageUrl}
                     alt={product.name}
-                    className="max-h-full max-w-full object-contain"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-[#181725] text-base truncate group-hover:text-[#53B175] transition-colors">
+                  <h4 className="font-bold text-[#181725] text-base truncate group-hover:text-[#53B175] transition-colors leading-tight">
                     {product.name}
                   </h4>
-                  <p className="text-xs text-[#7C7C7C] font-medium">{product.unit}</p>
+                  <p className="text-xs text-[#7C7C7C] font-semibold mt-1">{product.unit}</p>
                 </div>
 
-                {/* Price & Chevron */}
-                <div className="flex items-center space-x-3">
-                  <span className="font-bold text-[#181725] text-base">${product.price.toFixed(2)}</span>
+                {/* Price & Actions */}
+                <div className="flex items-center space-x-3 shrink-0">
+                  <span className="font-extrabold text-[#181725] text-base sm:text-lg">${product.price.toFixed(2)}</span>
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleFavorite(product.id);
+                      addToast('Removed from wishlist', 'info');
                     }}
-                    className="p-1 text-gray-300 hover:text-red-500 rounded-full"
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
                     aria-label="Remove favorite"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Sticky Bottom CTA */}
-          <div className="fixed bottom-16 sm:bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-[#F2F3F2] z-30 max-w-md mx-auto sm:max-w-none">
+          {/* Desktop inline CTA (Never overlaps content!) */}
+          <div className="hidden md:block">
+            <PillButton onClick={handleAddAllToCart} size="lg" icon={<ShoppingBag className="w-5 h-5" />}>
+              Add All To Cart
+            </PillButton>
+          </div>
+
+          {/* Mobile Docked Bottom CTA */}
+          <div className="md:hidden fixed bottom-16 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-[#F2F3F2] z-30 max-w-md mx-auto">
             <PillButton onClick={handleAddAllToCart} size="lg" icon={<ShoppingBag className="w-5 h-5" />}>
               Add All To Cart
             </PillButton>
