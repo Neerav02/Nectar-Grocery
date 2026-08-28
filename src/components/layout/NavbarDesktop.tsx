@@ -38,26 +38,19 @@ export const NavbarDesktop: React.FC<NavbarDesktopProps> = ({
         {/* Brand Logo Lockup */}
         <div
           onClick={() => onTabChange('shop')}
-          className="flex items-center space-x-2.5 cursor-pointer group focus-visible:ring-2 focus-visible:ring-[#53B175] rounded-xl p-1"
+          className="flex items-center space-x-3 cursor-pointer group focus-visible:ring-2 focus-visible:ring-[#53B175] rounded-xl p-1 shrink-0"
           tabIndex={0}
           role="button"
         >
           {/* Carrot Logo Mark */}
-          <div className="bg-white p-1 rounded-xl shadow-xs">
-            <img
-              src="/images/ICON_1.png"
-              alt="Nectar Logo"
-              className="w-8 h-9 object-contain group-hover:scale-105 transition-transform"
-            />
-          </div>
-          <div>
-            <span className="text-2xl font-extrabold text-[#181725] tracking-tight group-hover:text-[#53B175] transition-colors">
-              nectar
-            </span>
-            <span className="block text-[10px] text-[#7C7C7C] font-semibold -mt-1 tracking-wider uppercase">
-              Online Groceries
-            </span>
-          </div>
+          <img
+            src="/images/ICON_1.png"
+            alt="Nectar Logo"
+            className="w-10 h-11 sm:w-11 sm:h-12 object-contain group-hover:scale-105 transition-transform"
+          />
+          <span className="text-3xl font-extrabold text-[#181725] tracking-tight group-hover:text-[#53B175] transition-colors leading-none">
+            nectar
+          </span>
         </div>
 
         {/* Location Picker pill */}

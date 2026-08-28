@@ -101,11 +101,11 @@ export const HomePage: React.FC<HomePageProps> = ({
     <div className="space-y-6 pb-24 md:pb-12 animate-fade-in">
       {/* Mobile Top Header (Carrot Icon + Location) */}
       <div className="md:hidden flex flex-col items-center pt-2">
-        <div className="bg-white p-1 rounded-xl shadow-xs mb-2">
+        <div className="mb-2">
           <img
             src="/images/ICON_1.png"
             alt="Nectar Logo"
-            className="w-8 h-9 object-contain"
+            className="w-10 h-11 object-contain"
           />
         </div>
         <button
