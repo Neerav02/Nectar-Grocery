@@ -6,6 +6,7 @@ interface SignInWelcomePageProps {
   onSelectPhone: () => void;
   onGoogleSignIn: () => void;
   onFacebookSignIn: () => void;
+  onEmailSignIn: () => void;
 }
 
 export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
@@ -13,11 +14,12 @@ export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
   onSelectPhone,
   onGoogleSignIn,
   onFacebookSignIn,
+  onEmailSignIn,
 }) => {
   return (
     <div className="fixed inset-0 bg-white flex flex-col max-w-md mx-auto shadow-2xl animate-fade-in overflow-hidden z-50">
       {/* Top Hero — fresh vegetables banner */}
-      <div className="relative flex-shrink-0" style={{ height: '45vh' }}>
+      <div className="relative flex-shrink-0" style={{ height: '42vh' }}>
         {/* Back Button */}
         {onBack && (
           <button
@@ -39,10 +41,10 @@ export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
       </div>
 
       {/* Content Card — fits remaining screen height */}
-      <div className="flex-1 flex flex-col justify-between px-6 pt-2 pb-8 bg-white">
+      <div className="flex-1 flex flex-col justify-between px-6 pt-2 pb-6 bg-white overflow-y-auto">
         {/* Headline */}
         <div>
-          <h2 className="text-2xl font-extrabold text-[#181725] leading-snug mb-5">
+          <h2 className="text-2xl font-extrabold text-[#181725] leading-snug mb-4">
             Get your groceries <br />
             <span className="text-[#53B175]">with nectar</span>
           </h2>
@@ -53,7 +55,7 @@ export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
             tabIndex={0}
             onClick={onSelectPhone}
             onKeyDown={(e) => e.key === 'Enter' && onSelectPhone()}
-            className="flex items-center gap-3 border-b-2 border-[#E2E2E2] hover:border-[#53B175] py-3 cursor-pointer transition-colors rounded-none"
+            className="flex items-center gap-3 border-b-2 border-[#E2E2E2] hover:border-[#53B175] py-2.5 cursor-pointer transition-colors rounded-none"
           >
             <span className="text-2xl">🇮🇳</span>
             <span className="font-bold text-[#181725] text-base">+91</span>
@@ -66,19 +68,32 @@ export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
           </div>
         </div>
 
-        {/* Social Options */}
-        <div className="space-y-3">
+        {/* Social & Email Auth Options */}
+        <div className="space-y-2.5 pt-3">
           <p className="text-center text-xs font-bold text-[#7C7C7C] tracking-wide uppercase">
             Or connect with
           </p>
+
+          {/* Email / Password Login */}
+          <button
+            type="button"
+            onClick={onEmailSignIn}
+            className="w-full h-13 bg-[#53B175] hover:bg-[#479b66] active:scale-[0.99] text-white font-bold text-base rounded-2xl flex items-center justify-between px-5 transition-all shadow-sm"
+          >
+            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#53B175] text-sm shrink-0">
+              ✉
+            </div>
+            <span className="flex-1 text-center">Continue with Email</span>
+            <div className="w-7" />
+          </button>
 
           {/* Google */}
           <button
             type="button"
             onClick={onGoogleSignIn}
-            className="w-full h-14 bg-[#5383EC] hover:bg-[#4273DF] active:scale-[0.99] text-white font-bold text-base rounded-2xl flex items-center justify-between px-5 transition-all shadow-sm"
+            className="w-full h-13 bg-[#5383EC] hover:bg-[#4273DF] active:scale-[0.99] text-white font-bold text-base rounded-2xl flex items-center justify-between px-5 transition-all shadow-sm"
           >
-            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#5383EC] text-sm flex-shrink-0">
+            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#5383EC] text-sm shrink-0">
               G
             </div>
             <span className="flex-1 text-center">Continue with Google</span>
@@ -89,9 +104,9 @@ export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
           <button
             type="button"
             onClick={onFacebookSignIn}
-            className="w-full h-14 bg-[#4A66AC] hover:bg-[#3B5495] active:scale-[0.99] text-white font-bold text-base rounded-2xl flex items-center justify-between px-5 transition-all shadow-sm"
+            className="w-full h-13 bg-[#4A66AC] hover:bg-[#3B5495] active:scale-[0.99] text-white font-bold text-base rounded-2xl flex items-center justify-between px-5 transition-all shadow-sm"
           >
-            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#4A66AC] text-sm flex-shrink-0">
+            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#4A66AC] text-sm shrink-0">
               f
             </div>
             <span className="flex-1 text-center">Continue with Facebook</span>

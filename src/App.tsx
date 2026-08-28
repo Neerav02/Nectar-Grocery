@@ -118,6 +118,7 @@ export function App() {
         onSelectPhone={() => setCurrentStep('enter_phone')}
         onGoogleSignIn={handleCompleteAuthSequence}
         onFacebookSignIn={handleCompleteAuthSequence}
+        onEmailSignIn={() => setCurrentStep('login_email')}
       />
     );
   }
