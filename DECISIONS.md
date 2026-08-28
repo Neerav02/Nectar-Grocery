@@ -24,47 +24,120 @@ In asynchronous search applications communicating with backends or simulated net
 | **Option 2: Timestamp Tagging** | Tag queries with `Date.now()` and discard responses with older timestamps. | Avoids stale state updates. | Leaves orphaned network requests running in the background. | ⚠️ Partial |
 | **Option 3: AbortController + Token Guard** | Instantly abort pending HTTP fetch requests via `AbortController.abort()` AND validate `activeRequestId` token before committing state to Zustand. | Cancels in-flight requests immediately; zero race conditions; full telemetry control. | Requires careful cleanup logic inside Zustand actions. | ✅ **Selected** |
 
-### Implementation Details (`useSearchStore.ts`)
+### Verified Actual Implementation (`src/stores/useSearchStore.ts`)
 ```typescript
-interface SearchStoreState {
-  searchQuery: string;
-  searchResults: Product[];
+interface SearchState {
+  query: string;
+  results: Product[];
   isLoading: boolean;
-  activeRequestId: number;
-  abortController: AbortController | null;
-
-  setSearchQuery: (query: string) => Promise<void>;
-  // ...
+  error: string | null;
+  
+  // Engineering Challenge A features
+  isStaleProtectionEnabled: boolean;
+  activeRequestId: string | null;
+  requestLogs: RequestLogEntry[];
+  
+  // Actions
+  setQuery: (query: string) => void;
+  executeSearch: (searchQuery: string, forcedLatencyMs?: number) => Promise<void>;
+  toggleStaleProtection: () => void;
+  clearRequestLogs: () => void;
+  resetSearch: () => void;
 }
 
-setSearchQuery: async (query: string) => {
-  // 1. Abort existing in-flight request
-  if (get().abortController) {
-    get().abortController?.abort();
+let activeAbortController: AbortController | null = null;
+
+executeSearch: async (searchQuery: string, forcedLatencyMs?: number) => {
+  const trimmed = searchQuery.trim();
+  if (!trimmed) {
+    set({ results: [], isLoading: false, error: null });
+    return;
   }
 
-  const newController = new AbortController();
-  const requestId = Date.now();
+  // Generate unique request ID
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const startTime = Date.now();
 
-  set({
-    searchQuery: query,
+  // Guard 1: Abort previous pending network request if protection is enabled
+  if (get().isStaleProtectionEnabled && activeAbortController) {
+    activeAbortController.abort('New search request initiated');
+  }
+
+  const controller = new AbortController();
+  if (get().isStaleProtectionEnabled) {
+    activeAbortController = controller;
+  }
+
+  set((state) => ({
     isLoading: true,
+    error: null,
     activeRequestId: requestId,
-    abortController: newController,
-  });
+    requestLogs: [
+      {
+        id: requestId,
+        query: trimmed,
+        startedAt: startTime,
+        latencyMs: forcedLatencyMs || 0,
+        status: 'pending',
+      },
+      ...state.requestLogs,
+    ],
+  }));
 
   try {
-    const results = await mockFetchProducts(query, newController.signal);
-    // 2. Validate token: Only update state if requestId matches activeRequestId
-    if (get().activeRequestId === requestId) {
-      set({ searchResults: results, isLoading: false });
+    const response = await searchProductsApi(
+      trimmed,
+      requestId,
+      get().isStaleProtectionEnabled ? controller.signal : undefined,
+      forcedLatencyMs
+    );
+
+    const endTime = Date.now();
+    const currentActiveId = get().activeRequestId;
+    const isProtectionOn = get().isStaleProtectionEnabled;
+
+    // Guard 2: Discard out-of-order stale responses if activeRequestId doesn't match
+    if (isProtectionOn && response.requestId !== currentActiveId) {
+      set((state) => ({
+        requestLogs: state.requestLogs.map((log) =>
+          log.id === requestId
+            ? { ...log, completedAt: endTime, status: 'rejected_stale' }
+            : log
+        ),
+      }));
+      return;
     }
-  } catch (err: any) {
-    if (err.name !== 'AbortError' && get().activeRequestId === requestId) {
-      set({ isLoading: false });
+
+    // Valid current response
+    set((state) => ({
+      results: response.results,
+      isLoading: false,
+      requestLogs: state.requestLogs.map((log) =>
+        log.id === requestId ? { ...log, completedAt: endTime, status: 'fulfilled' } : log
+      ),
+    }));
+  } catch (err: unknown) {
+    const errorObj = err as { name?: string; message?: string };
+    if (errorObj?.name === 'AbortError') {
+      set((state) => ({
+        requestLogs: state.requestLogs.map((log) =>
+          log.id === requestId
+            ? { ...log, completedAt: Date.now(), status: 'aborted' }
+            : log
+        ),
+      }));
+      return;
     }
+
+    set((state) => ({
+      isLoading: false,
+      error: errorObj?.message || 'Search failed',
+      requestLogs: state.requestLogs.map((log) =>
+        log.id === requestId ? { ...log, completedAt: Date.now(), status: 'rejected_stale' } : log
+      ),
+    }));
   }
-};
+}
 ```
 
 ### Trade-offs & Verification
@@ -91,53 +164,56 @@ Naive implementations crash with `TypeError: Cannot read properties of undefined
 | **Option 2: Silent Price Update** | Item prices update silently without notifying the user. | Keeps totals accurate, but causes checkout confusion when total bill shifts. | ❌ Rejected |
 | **Option 3: On-Mount Catalog Sync (`validateAndSyncCart`)** | Compares saved cart items against live catalog metadata on mount. Discontinued items are removed with toast alerts; price shifts update totals with comparative warning badges (`Price updated from $X to $Y`); stock limits cap item quantities gracefully. | Preserves valid items, maintains 100% price accuracy, and provides full transparency. | ✅ **Selected** |
 
-### Implementation Details (`useCartStore.ts`)
+### Verified Actual Implementation (`src/stores/useCartStore.ts`)
 ```typescript
 validateAndSyncCart: () => {
   set((state) => {
-    const alerts: CartResilienceAlert[] = [];
-    const updatedItems: CartItem[] = [];
+    const newWarnings: string[] = [];
+    const validatedItems: CartItem[] = [];
 
-    state.items.forEach((item) => {
-      const liveProduct = INITIAL_PRODUCTS.find((p) => p.id === item.id);
+    state.items.forEach((cartItem) => {
+      // Check 1: Does product still exist in dataset?
+      const latestProduct = INITIAL_PRODUCTS.find((p) => p.id === cartItem.product.id);
 
-      if (!liveProduct) {
-        alerts.push({
-          id: `alert-del-${item.id}`,
-          type: 'removed',
-          message: `"${item.name}" was removed because it is no longer available.`,
-        });
-        return;
+      if (!latestProduct) {
+        newWarnings.push(
+          `Item Removed: '${cartItem.product.name}' is no longer available in our store and was removed from your cart.`
+        );
+        return; // Exclude missing product
       }
 
-      let currentQty = item.quantity;
-      if (liveProduct.stock !== undefined && currentQty > liveProduct.stock) {
-        currentQty = Math.max(1, liveProduct.stock);
-        alerts.push({
-          id: `alert-stock-${item.id}`,
-          type: 'stock_adjusted',
-          message: `Quantity for "${item.name}" adjusted to available stock (${liveProduct.stock}).`,
-        });
+      let itemToSave = { ...cartItem, product: latestProduct };
+
+      // Check 2: Has price changed since cart persistence?
+      if (latestProduct.price !== cartItem.addedAtPrice) {
+        newWarnings.push(
+          `Price Update: '${latestProduct.name}' price updated from $${cartItem.addedAtPrice.toFixed(
+            2
+          )} to $${latestProduct.price.toFixed(2)}.`
+        );
+        itemToSave.previousPrice = cartItem.addedAtPrice;
+        itemToSave.addedAtPrice = latestProduct.price;
+        itemToSave.warning = 'price_changed';
       }
 
-      if (liveProduct.price !== item.price) {
-        alerts.push({
-          id: `alert-price-${item.id}`,
-          type: 'price_changed',
-          message: `Price for "${item.name}" updated from $${item.price.toFixed(2)} to $${liveProduct.price.toFixed(2)}.`,
-        });
+      // Check 3: Does quantity exceed available stock?
+      if (cartItem.quantity > latestProduct.stockQuantity) {
+        newWarnings.push(
+          `Stock Adjusted: '${latestProduct.name}' quantity reduced from ${cartItem.quantity} to ${latestProduct.stockQuantity} due to limited stock.`
+        );
+        itemToSave.quantity = latestProduct.stockQuantity;
+        itemToSave.warning = 'stock_capped';
       }
 
-      updatedItems.push({
-        ...item,
-        price: liveProduct.price,
-        quantity: currentQty,
-      });
+      validatedItems.push(itemToSave);
     });
 
-    return { items: updatedItems, resilienceAlerts: alerts };
+    return {
+      items: validatedItems,
+      resilienceWarnings: [...state.resilienceWarnings, ...newWarnings],
+    };
   });
-};
+}
 ```
 
 ---
