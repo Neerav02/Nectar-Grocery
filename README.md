@@ -9,6 +9,7 @@
   [![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
   [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4.0-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
   [![Zustand](https://img.shields.io/badge/State-Zustand%20v4-764ABC?logo=redux&logoColor=white)](https://zustand-demo.pmnd.rs/)
+  [![React Router](https://img.shields.io/badge/Router-React%20Router%20v6-CA4245?logo=reactrouter&logoColor=white)](https://reactrouter.com/)
   [![Vercel Live Demo](https://img.shields.io/badge/Vercel-Live%20Demo-000000?logo=vercel&logoColor=white)](https://nectar-grocery-flax.vercel.app)
   [![Build Status](https://img.shields.io/badge/Build-Passing-53B175)](https://github.com/Neerav02/Nectar-Grocery)
 
@@ -20,12 +21,13 @@
 
 > **Nectar** is a pixel-perfect, hyper-performant, and production-ready quick-commerce online grocery platform engineered directly from the 28-screen Nectar Grocery Figma design system. Designed to deliver an uncompromising user experience across both mobile viewports and wide-screen desktop displays, Nectar bridges the gap between modern e-commerce UI micro-interactions and complex client-side state resilience. 
 > 
-> The application features a robust asynchronous data layer with variable network latency simulation, advanced stale-search race condition guards via `AbortController` cancellation, and real-time persisted cart synchronization (`validateAndSyncCart`) that dynamically adjusts for catalog price shifts, stock bounds, and discontinued items. Coupled with an interactive 4-step live order tracking dashboard and single-card desktop checkout, Nectar represents a standalone, enterprise-grade frontend architecture.
+> The application features full URL routing via **React Router v6**, a robust asynchronous data layer with variable network latency simulation, advanced stale-search race condition guards via `AbortController` cancellation, and real-time persisted cart synchronization (`validateAndSyncCart`) that dynamically adjusts for catalog price shifts, stock bounds, and discontinued items. Coupled with an interactive 4-step live order tracking dashboard and single-card desktop checkout, Nectar represents a standalone, enterprise-grade frontend architecture.
 
 ---
 
 ## ✨ Executive Highlights & Feature Capabilities
 
+- 🛣️ **Full React Router Integration**: Deep-linking, shareable URLs, and native browser back/forward navigation across all views (`/`, `/explore`, `/category/:id`, `/product/:id`, `/cart`, `/account`, `/account/orders`).
 - 📱 **Mobile-First & Desktop Adapted**: Seamless transformation from mobile bottom-sheet navigation to desktop sticky header navbar (`NavbarDesktop`) with responsive 4-column product grids.
 - ⚡ **Engineering Challenge A (Stale Search Guard)**: Built-in `AbortController` cancellation + sequence token validation preventing out-of-order API race conditions with an interactive debug panel.
 - 🛒 **Engineering Challenge B (Persisted Cart Resilience)**: Auto-synchronization on mount (`validateAndSyncCart`) protecting against catalog price shifts, out-of-stock bounds, and deleted items without UI crashes.
@@ -36,10 +38,19 @@
 
 ## 🏛️ System Architecture & Data Flow
 
-The application follows a clean unidirectional data flow architecture powered by modular **Zustand stores** and a simulated asynchronous API layer with variable latency.
+The application follows a clean unidirectional data flow architecture powered by modular **Zustand stores**, **React Router v6 navigation**, and a simulated asynchronous API layer with variable latency.
 
 ```mermaid
 flowchart TD
+    subgraph ROUTER ["🛣️ React Router v6 URL Layer"]
+        R_SHOP["/ (Shop Page)"]
+        R_EXPLORE["/explore (Search & Filters)"]
+        R_CAT["/category/:id (Category View)"]
+        R_PROD["/product/:id (Product View)"]
+        R_CART["/cart (Cart & Checkout)"]
+        R_ACC["/account & /account/orders"]
+    end
+
     subgraph UI ["🖥️ UI & View Layer"]
         NAV["Desktop Top Header Navbar"]
         TAB["Mobile Bottom Tab Bar"]
@@ -60,17 +71,11 @@ flowchart TD
         STORE_FAV["useFavoritesStore (Wishlist State)"]
     end
 
-    subgraph ASYNC ["🔄 Async Data & Mock API Engine"]
-        API["Mock API Layer (200ms - 1200ms Latency)"]
-        CATALOG["Static Products & Categories JSON"]
-        STORAGE[("Browser LocalStorage")]
-    end
-
+    ROUTER --> UI
     P_SHOP --> NAV & TAB
-    P_SEARCH --> STORE_SEARCH <--> API <--> CATALOG
-    P_CART --> STORE_CART <--> STORAGE
-    M_CHECKOUT --> STORE_ORDER <--> STORAGE
-    STORE_AUTH <--> STORAGE
+    P_SEARCH --> STORE_SEARCH
+    P_CART --> STORE_CART
+    M_CHECKOUT --> STORE_ORDER
 ```
 
 ---
@@ -78,33 +83,33 @@ flowchart TD
 ## 🔄 User Workflow & Step-by-Step Lifecycle
 
 ```
-[ Splash Screen ] (Auto 1.5s Timer)
+[ Splash Screen ] (Auto 1.5s Timer -> /splash)
         │
         ▼
-[ Onboarding Carousel ] ──(Click "Get Started")──► [ Sign In Welcome Screen ]
+[ Onboarding Carousel ] ──(Click "Get Started")──► [ Sign In Welcome Screen (/signin) ]
                                                           │
           ┌───────────────────────────────────────────────┼──────────────────────────────┐
           ▼                                               ▼                              ▼
   [ Mobile OTP Login ]                           [ Continue with Email ]         [ Social Auth (Google/FB) ]
           │                                               │                              │
           ▼                                               ▼                              ▼
-  [ OTP Verification ]                           [ Email Login Screen ]          [ Immediate Session Login ]
+  [ OTP Verification ]                           [ Email Login Screen (/login) ] [ Immediate Session Login ]
           │                                               │                              │
           ▼                                               └──────────────┬───────────────┘
   [ Select Location ]                                                    │
           │                                                              ▼
-          └───────────────────────────────────────────────► [ Main Shop Page ] ◄────────────────┐
+          └───────────────────────────────────────────────► [ Main Shop Page (/) ] ◄────────────┐
                                                                  │                              │
                   ┌──────────────────────────────────────────────┼──────────────────────┐       │
                   ▼                                              ▼                      ▼       │
           [ Browse Banners ]                             [ Search Products ]     [ Filter Categories ]
-                  │                                              │                      │
+                  │                                         (/explore)           (/category/:id) │
                   └───────────────────────┬──────────────────────┘                      │
                                           ▼                                             │
-                              [ Product Detail View ]                                   │
+                              [ Product Detail View (/product/:id) ]                    │
                                           │                                             │
                                           ▼                                             │
-                              [ Add to Cart & Checkout ]                                │
+                              [ Add to Cart & Checkout (/cart) ]                        │
                                           │                                             │
                                           ▼                                             │
                              [ Single-Card Checkout Modal ]                             │
@@ -113,7 +118,7 @@ flowchart TD
                              [ Order Success Screen ]                                   │
                                           │                                             │
                                           ▼                                             │
-                             [ Profile & Live Tracking ] ───────────────────────────────┘
+                             [ Profile & Live Tracking (/account/orders) ] ──────────────┘
 ```
 
 ---
@@ -122,6 +127,7 @@ flowchart TD
 
 ### Core Frameworks & Tooling
 - **Core Library**: React 18.3.1
+- **Router Engine**: React Router v6 (`react-router-dom` v6.28)
 - **Build Engine**: Vite 8.2.2 (Ultra-fast HMR and optimized production bundle)
 - **Language**: TypeScript 5.6.3 Strict Mode (100% type safety, zero `any`)
 - **Styling**: Tailwind CSS v4 + Custom Vanilla CSS (Design system, custom scrollbars, animations)
@@ -157,18 +163,19 @@ flowchart TD
 
 ---
 
-## 📊 Candidate Assignment Evaluation & Feature Weightage Table
+## 📋 Assignment Feature Implementation Summary
 
-The project has been implemented to strictly satisfy 100% of the candidate assignment requirements and evaluation criteria specified in `Ahoum_Frontend_Developer_Assignment_24h.docx`:
+This application implements the core requirements outlined in `Ahoum_Frontend_Developer_Assignment_24h.docx`:
 
-| Evaluation Area | Official Weightage | Implementation Details & Proof of Work | Completion Status | Evidence / Verification Location |
-| :--- | :---: | :--- | :---: | :--- |
-| **Figma Implementation, Responsiveness & Core UX** | **40%** | Converted 28 mobile-first screens from Figma into a responsive React app. Created `NavbarDesktop` for desktop viewports (`≥ 768px`), dynamic 4-column product grids inside `max-w-7xl`, and single-card checkout modal (`maxWidth="xl"`). | ✅ **100% Complete** | `src/pages/`, `src/components/`, `DESIGN_NOTES.md` |
-| **State / Asynchronous Correctness & Edge Cases** | **25%** | Built `useSearchStore.ts` with `AbortController` cancellation and token guards (Challenge A). Implemented `validateAndSyncCart()` in `useCartStore.ts` for catalog price shifts, stock bounds, and deleted item resilience (Challenge B). | ✅ **100% Complete** | `src/stores/`, `DECISIONS.md`, `StaleSearchDebugPanel.tsx` |
-| **Engineering Decisions & Debugging** | **15%** | Documented 3 non-trivial architectural trade-offs in `DECISIONS.md` and 4 real debugging case studies with root cause analysis, code diffs, and verification steps in `DEBUGGING.md`. | ✅ **100% Complete** | `DECISIONS.md`, `DEBUGGING.md` |
-| **AI Supervision & Prompt Log** | **10%** | Documented material prompts using **Claude Code (Claude 3.7 Sonnet)** in `PROMPT_LOG.md`. Highlighted 4 concrete human corrections (Figma copy typos, debouncing vs AbortController, routing, scrollbars). | ✅ **100% Complete** | `PROMPT_LOG.md` |
-| **TypeScript / Code Quality & Documentation** | **10%** | Strict TypeScript compilation (`npx tsc --noEmit` with zero `any`), clean modular architecture, production Vite build (`npm run build`), and comprehensive repository README. | ✅ **100% Complete** | `tsconfig.json`, `README.md`, `package.json` |
-| **TOTAL EVALUATION SCORE** | **100%** | **ALL ASSIGNMENT REQUIREMENTS FULFILLED (PROD-READY)** | 🏆 **100%** | **REPOSITORIES & DOCS** |
+| Assignment Requirement | Implementation Strategy & File Evidence |
+| :--- | :--- |
+| **28 Mobile Figma Screens Implementation** | Converted 28 mobile screens into clean modular React views with responsive desktop adaptations (`src/pages/`, `src/components/`). |
+| **React Router Navigation** | Implemented URL-based routing (`/`, `/explore`, `/category/:id`, `/product/:id`, `/cart`, `/account`) using `react-router-dom` v6 (`src/App.tsx`). |
+| **Engineering Challenge A (Stale Search Guard)** | `AbortController` cancellation + `activeRequestId` token guard in `useSearchStore.ts` with telemetry debug panel. |
+| **Engineering Challenge B (Cart Consistency)** | `validateAndSyncCart()` in `useCartStore.ts` checking price updates, stock bounds, and discontinued products on mount. |
+| **Desktop Adaptation** | Created `NavbarDesktop` header bar (`≥ 768px`), responsive 4-column product grid, and single-card checkout modal (`maxWidth="xl"`). |
+| **Engineering Documentation** | Detailed trade-off analysis in `DECISIONS.md`, debugging teardowns in `DEBUGGING.md`, and AI prompt logs in `PROMPT_LOG.md`. |
+| **TypeScript Strictness & Clean Build** | Strict mode enabled in `tsconfig.json`, zero `any` usage, verified via `npx tsc --noEmit` and Vite production build (`npm run build`). |
 
 ---
 
@@ -181,17 +188,7 @@ The project has been implemented to strictly satisfy 100% of the candidate assig
    - **Framework Preset**: `Vite`
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-4. Click **Deploy**. Vercel will build the project and issue a live URL (e.g. `https://nectar-grocery-flax.vercel.app`).
-
-### Method 2: Deploy via Vercel CLI (Terminal)
-1. Open terminal inside the project directory:
-   ```bash
-   npx vercel login
-   ```
-2. Run production deployment:
-   ```bash
-   npx vercel --prod
-   ```
+4. Click **Deploy**. Vercel will build the project and issue a live URL (`https://nectar-grocery-flax.vercel.app`).
 
 ---
 
@@ -255,9 +252,9 @@ nectar-grocery-app/
 │   ├── pages/                 # Full application pages (Shop, Explore, Cart, Account, etc.)
 │   ├── stores/                # Zustand global state stores (cart, order, search, auth, etc.)
 │   ├── types/                 # TypeScript data contracts & interfaces
-│   ├── App.tsx                # Main routing & step execution shell
+│   ├── App.tsx                # React Router v6 routing & step execution shell
 │   ├── index.css              # Custom styling tokens, fonts & animations
-│   └── main.tsx               # Application entry point
+│   └── main.tsx               # Application entry point with BrowserRouter
 ├── DESIGN_NOTES.md            # Mobile-to-desktop layout adaptation decisions
 ├── DECISIONS.md               # Architectural trade-off decisions
 ├── DEBUGGING.md               # Real-world debugging & troubleshooting log
@@ -277,11 +274,3 @@ nectar-grocery-app/
 - [`DECISIONS.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/DECISIONS.md): 3 architectural trade-offs including stale search protection and cart resilience.
 - [`PROMPT_LOG.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/PROMPT_LOG.md): AI prompt log and human supervision corrections (Figma copy typos & async race condition guards).
 - [`DEBUGGING.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/DEBUGGING.md): Real troubleshooting logs (TypeScript CSS side-effect imports & Vite HTML script entry resolution).
-
----
-
-## 🔮 Future Enhancements
-
-1. **GraphQL / WebSocket Driver Tracking**: Real-time WebSocket connection for live delivery driver GPS map updates.
-2. **Automated E2E Testing Suite**: Playwright testing for stale search aborts and cart persistence under price changes.
-3. **PWA Offline Mode**: Service worker asset caching for offline grocery shopping support.
