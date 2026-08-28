@@ -15,6 +15,43 @@ Rather than stretching a 375px mobile UI across widescreen monitors—which lead
 
 ---
 
+## 📱 28 Figma Screen Verification Matrix
+
+Below is the verified mapping of all 28 mobile screens from the original Figma design system to their responsive implementation across Mobile (375px), Tablet (768px), and Desktop (1440px):
+
+| Screen # | Figma Screen Name | Implementation Component | Mobile Viewport (<640px) | Desktop Viewport (≥768px) |
+| :---: | :--- | :--- | :--- | :--- |
+| **01** | Splash Screen | `SplashPage.tsx` | Full-screen brand lockup (1.5s auto transition) | Centered ambient glow hero screen |
+| **02** | Onboarding Screen | `OnboardingPage.tsx` | Full-bleed hero banner with top courier crop | 2-Column Split Showcase with Category Collage |
+| **03** | Sign In Welcome | `SignInWelcomePage.tsx` | Slide-up bottom sheet with social auth | Centered backdrop-blurred modal dialog card |
+| **04** | Number Login | `EnterNumberPage.tsx` | Mobile phone input with flag dropdown | Centered backdrop-blurred auth dialog |
+| **05** | Verification OTP | `VerificationPage.tsx` | 4-digit pincode input with auto-focus | Centered backdrop-blurred auth dialog |
+| **06** | Select Location | `SelectLocationPage.tsx` | Zone & area picker dropdowns | Centered backdrop-blurred dialog |
+| **07** | Log In Email | `LogInPage.tsx` | Email & password form with visibility toggle | Centered auth dialog card |
+| **08** | Sign Up Email | `SignUpPage.tsx` | Registration form with Terms checkbox | Centered auth dialog card |
+| **09** | Shop Home Landing | `HomePage.tsx` | Carousel banner + 2-col product grid | Top header navbar + 4-col responsive grid |
+| **10** | Exclusive Offer Section | `HomePage.tsx` | Horizontal swipeable product reel | Responsive 4-col grid section |
+| **11** | Best Selling Section | `HomePage.tsx` | Horizontal swipeable product reel | Responsive 4-col grid section |
+| **12** | Groceries Section | `HomePage.tsx` | Pastel category cards carousel | Responsive multi-column grid |
+| **13** | Product Detail View | `ProductDetailPage.tsx` | Full-screen view with accordion specs | Split hero image + detailed specs panel |
+| **14** | Explore Categories | `SearchPage.tsx` | 2-column pastel category grid | Integrated header search + 4-col grid |
+| **15** | Category Listing | `CategoryListingPage.tsx` | Filter button + 2-col category grid | Active filter badges + 4-col product grid |
+| **16** | Filter Drawer Sheet | `FilterSheet.tsx` | Full-screen bottom sheet filter | Slide-over drawer with draft filter state |
+| **17** | Search Input View | `SearchPage.tsx` | Live instant search with clear button | Stale-search debug panel + live search |
+| **18** | Search Results Grid | `SearchPage.tsx` | Filtered product grid (2 columns) | Filtered product grid (4 columns) |
+| **19** | Cart View | `CartPage.tsx` | Vertical item list + checkout bar | Cart table + price updates & total summary |
+| **20** | Cart Price Update Alert | `useCartStore.ts` | Banner toast for catalog price shifts | Highlighted line-item badges (`was $X, now $Y`) |
+| **21** | Checkout Modal | `CheckoutModal.tsx` | Bottom sheet with payment options | Single-card floating modal (`maxWidth="xl"`) |
+| **22** | Delivery Address Picker | `LocationModal.tsx` | Mobile address select sheet | Centered dialog card |
+| **23** | Payment Method Picker | `CheckoutModal.tsx` | Accordion payment selection | Integrated single-card payment options |
+| **24** | Promo Code Input | `CheckoutModal.tsx` | Inline coupon code field | Instant discount calculation row |
+| **25** | Order Accepted Success | `OrderSuccessModal.tsx` | Success icon + track order button | Confetti particle burst + order CTA |
+| **26** | Order Failed Error | `OrderFailureModal.tsx` | Error icon + retry payment button | Failure diagnosis dialog card |
+| **27** | Account Profile Menu | `AccountPage.tsx` | Profile menu list with logout button | Profile header + section navigation tabs |
+| **28** | Live Order Tracking | `AccountPage.tsx` | Vertical status list | Real-time 4-step stepper + driver card |
+
+---
+
 ## 🔍 Key Desktop Adaptations & Architectural Rationale
 
 ### 1. Top Application Navbar vs. Mobile Bottom Tab Bar

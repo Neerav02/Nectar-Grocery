@@ -7,12 +7,17 @@ import { INITIAL_CATEGORIES, INITIAL_PRODUCTS } from '../api/productsData';
 import { useSearchStore } from '../stores/useSearchStore';
 import { useFilterStore } from '../stores/useFilterStore';
 
+import { useSearchParams } from 'react-router-dom';
+
 interface SearchPageProps {
   onSelectProduct: (product: Product) => void;
   onSelectCategory?: (category: Category) => void;
 }
 
 export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelectCategory }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialUrlQuery = searchParams.get('q') || '';
+
   const { query, setQuery, results, isLoading, error, executeSearch, resetSearch } =
     useSearchStore();
 
@@ -28,16 +33,27 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
     resetFilters,
   } = useFilterStore();
 
-  // Debounced search effect
+  // Sync URL search query parameter on mount
+  React.useEffect(() => {
+    if (initialUrlQuery && initialUrlQuery !== query) {
+      setQuery(initialUrlQuery);
+      executeSearch(initialUrlQuery);
+    }
+  }, []);
+
+  // Debounced search effect + URL search params update
   React.useEffect(() => {
     const timer = setTimeout(() => {
       if (query.trim()) {
         executeSearch(query);
+        setSearchParams({ q: query.trim() }, { replace: true });
+      } else {
+        setSearchParams({}, { replace: true });
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [query, executeSearch]);
+  }, [query, executeSearch, setSearchParams]);
 
   const hasActiveFilters =
     appliedFilters.brands.length > 0 ||
