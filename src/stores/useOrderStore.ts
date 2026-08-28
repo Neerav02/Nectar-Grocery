@@ -39,6 +39,7 @@ interface OrderStoreState {
   // Actions
   addOrder: (orderData: Omit<OrderRecord, 'id' | 'orderNumber' | 'date' | 'status' | 'estimatedDelivery' | 'deliveryPartner'>) => OrderRecord;
   setActiveOrder: (order: OrderRecord | null) => void;
+  advanceOrderStatus: (orderId: string) => void;
 }
 
 const INITIAL_DEMO_ORDERS: OrderRecord[] = [
@@ -103,12 +104,12 @@ export const useOrderStore = create<OrderStoreState>()(
           id,
           orderNumber,
           date: dateStr,
-          status: 'Packing Groceries',
+          status: 'Order Placed',
           estimatedDelivery: '15-20 Mins',
           deliveryPartner: {
             name: 'Vikram Singh',
             phone: '+91 98765 12345',
-            vehicle: 'Express Delivery Bike (KA-03-[#7721])',
+            vehicle: 'Express Delivery Bike (KA-03-EV-7721)',
           },
         };
 
@@ -121,6 +122,34 @@ export const useOrderStore = create<OrderStoreState>()(
       },
 
       setActiveOrder: (order) => set({ activeOrder: order }),
+
+      advanceOrderStatus: (orderId) => {
+        set((state) => {
+          const nextStatusMap: Record<OrderRecord['status'], OrderRecord['status']> = {
+            'Order Placed': 'Packing Groceries',
+            'Packing Groceries': 'Out for Delivery',
+            'Out for Delivery': 'Delivered',
+            'Delivered': 'Delivered',
+          };
+
+          const updatedOrders = state.orders.map((o) => {
+            if (o.id === orderId) {
+              const nextStatus = nextStatusMap[o.status];
+              return { ...o, status: nextStatus };
+            }
+            return o;
+          });
+
+          const updatedActive = state.activeOrder?.id === orderId
+            ? updatedOrders.find((o) => o.id === orderId) || state.activeOrder
+            : state.activeOrder;
+
+          return {
+            orders: updatedOrders,
+            activeOrder: updatedActive,
+          };
+        });
+      },
     }),
     {
       name: 'nectar_orders_storage',

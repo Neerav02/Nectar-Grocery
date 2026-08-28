@@ -51,14 +51,34 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onOpenAuth, initialSec
     (initialSection as SectionType) || 'menu'
   );
 
+  const advanceOrderStatus = useOrderStore((state) => state.advanceOrderStatus);
+
   React.useEffect(() => {
     if (initialSection) {
       setActiveSection(initialSection as SectionType);
     }
   }, [initialSection]);
+
   const [selectedOrder, setSelectedOrder] = useState<OrderRecord | null>(
     activeOrder || orders[0] || null
   );
+
+  // Sync selectedOrder with order store updates
+  React.useEffect(() => {
+    if (activeOrder) {
+      setSelectedOrder(activeOrder);
+    }
+  }, [activeOrder]);
+
+  // Live order tracking status progression simulation (every 12 seconds)
+  React.useEffect(() => {
+    if (activeSection === 'orders' && selectedOrder && selectedOrder.status !== 'Delivered') {
+      const timer = setInterval(() => {
+        advanceOrderStatus(selectedOrder.id);
+      }, 12000);
+      return () => clearInterval(timer);
+    }
+  }, [activeSection, selectedOrder, advanceOrderStatus]);
 
   // Address edit state
   const [newArea, setNewArea] = useState(userLocation.area);
