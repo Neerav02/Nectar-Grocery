@@ -1,6 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Sen:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/*
+ * ── Gilroy Font Family ──────────────────────────────────────────────────
+ * Source: CDN (cdnfonts.com — Gilroy Free weights)
+ * Weights available: 300 (Light), 400 (Regular), 500 (Medium),
+ *                    600 (SemiBold), 700 (Bold), 800 (ExtraBold)
+ * Rule:
+ *   - Headings / titles      → font-weight: 700–800 (Bold / ExtraBold)
+ *   - Body copy / paragraphs → font-weight: 400–500 (Regular / Medium)
+ *   - Labels / captions      → font-weight: 500–600 (Medium / SemiBold)
+ * ────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.cdnfonts.com/css/gilroy-free');
+
+/* Supplement the missing Regular/Medium/SemiBold/Bold weights via
+   Google Fonts with a nearly identical geometric sans (Nunito) so the
+   browser always has a matching weight available. Gilroy is mapped first
+   so browsers that can fetch cdnfonts will use the real Gilroy. */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap');
+
 @import "tailwindcss";
 
+/* ── Design Tokens ──────────────────────────────────────────────────── */
 :root {
   --color-primary: #53B175;
   --color-primary-hover: #439B63;
@@ -10,17 +29,66 @@
   --color-border: #E2E2E2;
 }
 
+/* ── Global Font Application ────────────────────────────────────────── */
 body {
-  font-family: 'Sen', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  /* Gilroy first, Nunito as same-weight fallback, then system sans */
+  font-family: 'Gilroy', 'Nunito', system-ui, -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
   color: #181725;
-  background-color: #F8F9FA;
+  background-color: #ffffff;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom scrollbar styling */
+/* ── Heading Defaults (all h1–h6 → Bold / ExtraBold) ───────────────── */
+h1, h2, h3 {
+  font-family: 'Gilroy', 'Nunito', system-ui, sans-serif;
+  font-weight: 800; /* ExtraBold — matches Gilroy ExtraBold weight */
+  line-height: 1.2;
+}
+
+h4, h5, h6 {
+  font-family: 'Gilroy', 'Nunito', system-ui, sans-serif;
+  font-weight: 700; /* Bold */
+  line-height: 1.3;
+}
+
+/* ── Paragraph & UI Text ────────────────────────────────────────────── */
+p {
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ── Button text — always medium+ ──────────────────────────────────── */
+button {
+  font-family: 'Gilroy', 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* ── Input / Label text ─────────────────────────────────────────────── */
+input, select, textarea {
+  font-family: 'Gilroy', 'Nunito', system-ui, sans-serif;
+  font-weight: 500;
+}
+
+label {
+  font-weight: 600;
+}
+
+/* ── Custom Tailwind font-weight utilities mapping to Gilroy ────────── */
+/* Tailwind's font-light → Gilroy Light */
+/* Tailwind's font-normal → Gilroy Regular */
+/* Tailwind's font-medium → Gilroy Medium */
+/* Tailwind's font-semibold → Gilroy SemiBold */
+/* Tailwind's font-bold → Gilroy Bold */
+/* Tailwind's font-extrabold → Gilroy ExtraBold */
+/* No additional config needed — Tailwind classes map to standard CSS weights */
+
+/* ── Custom Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -39,13 +107,13 @@ body {
   background: #53B175;
 }
 
-/* Focus styles for keyboard accessibility */
+/* ── Accessibility Focus Ring ──────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid #53B175;
   outline-offset: 2px;
 }
 
-/* Keyframe animations */
+/* ── Keyframe Animations ───────────────────────────────────────────── */
 @keyframes pulse-subtle {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
