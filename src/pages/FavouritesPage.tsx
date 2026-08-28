@@ -6,6 +6,7 @@ import { PillButton } from '../components/common/PillButton';
 import { INITIAL_PRODUCTS } from '../api/productsData';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
 import { useCartStore } from '../stores/useCartStore';
+import { useToastStore } from '../stores/useToastStore';
 
 interface FavouritesPageProps {
   onSelectProduct: (product: Product) => void;
@@ -16,11 +17,13 @@ export const FavouritesPage: React.FC<FavouritesPageProps> = ({ onSelectProduct,
   const favoriteIds = useFavoritesStore((state) => state.favoriteIds);
   const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
   const addItem = useCartStore((state) => state.addItem);
+  const addToast = useToastStore((state) => state.addToast);
 
   const favoriteProducts = INITIAL_PRODUCTS.filter((p) => favoriteIds.includes(p.id));
 
   const handleAddAllToCart = () => {
     favoriteProducts.forEach((p) => addItem(p, 1));
+    addToast('Added to the basket', 'success');
   };
 
   return (

@@ -3,6 +3,7 @@ import { Plus, Heart, Check } from 'lucide-react';
 import { Product } from '../../types';
 import { useCartStore } from '../../stores/useCartStore';
 import { useFavoritesStore } from '../../stores/useFavoritesStore';
+import { useToastStore } from '../../stores/useToastStore';
 import { clsx } from 'clsx';
 
 interface ProductCardProps {
@@ -14,6 +15,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) =>
   const addItem = useCartStore((state) => state.addItem);
   const isFav = useFavoritesStore((state) => state.isFavorite(product.id));
   const toggleFav = useFavoritesStore((state) => state.toggleFavorite);
+  const addToast = useToastStore((state) => state.addToast);
 
   const [isAdded, setIsAdded] = useState(false);
 
@@ -21,12 +23,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) =>
     e.stopPropagation();
     addItem(product, 1);
     setIsAdded(true);
+    addToast('Added to the basket', 'success');
     setTimeout(() => setIsAdded(false), 1200);
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFav(product.id);
+    if (!isFav) {
+      addToast('Added to wishlist', 'success');
+    } else {
+      addToast('Removed from wishlist', 'info');
+    }
   };
 
   return (

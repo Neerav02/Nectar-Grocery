@@ -5,6 +5,7 @@ import { QuantityStepper } from '../components/common/QuantityStepper';
 import { PillButton } from '../components/common/PillButton';
 import { useCartStore } from '../stores/useCartStore';
 import { useFavoritesStore } from '../stores/useFavoritesStore';
+import { useToastStore } from '../stores/useToastStore';
 import { clsx } from 'clsx';
 
 interface ProductDetailPageProps {
@@ -16,6 +17,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, o
   const addItem = useCartStore((state) => state.addItem);
   const isFav = useFavoritesStore((state) => state.isFavorite(product.id));
   const toggleFav = useFavoritesStore((state) => state.toggleFavorite);
+  const addToast = useToastStore((state) => state.addToast);
 
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -29,7 +31,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, o
   const handleAddToCart = () => {
     addItem(product, quantity);
     setIsAdded(true);
+    addToast('Added to the basket', 'success');
     setTimeout(() => setIsAdded(false), 1500);
+  };
+
+  const handleToggleFavorite = () => {
+    toggleFav(product.id);
+    if (!isFav) {
+      addToast('Added to wishlist', 'success');
+    } else {
+      addToast('Removed from wishlist', 'info');
+    }
   };
 
   return (
@@ -87,7 +99,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, o
 
         <button
           type="button"
-          onClick={() => toggleFav(product.id)}
+          onClick={handleToggleFavorite}
           aria-label={isFav ? 'Remove from favourites' : 'Add to favourites'}
           className="p-2 rounded-full hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-[#53B175] shrink-0"
         >

@@ -24,6 +24,7 @@ import { FilterSheet } from './components/filter/FilterSheet';
 import { CheckoutModal } from './components/cart/CheckoutModal';
 import { OrderSuccessModal } from './components/cart/OrderSuccessModal';
 import { OrderFailureModal } from './components/cart/OrderFailureModal';
+import { ToastContainer } from './components/common/ToastContainer';
 
 import { Category, Product, TabType } from './types';
 import { useAuthStore } from './stores/useAuthStore';
@@ -169,6 +170,9 @@ export function App() {
   // 9. Main Application View
   return (
     <div className="min-h-screen bg-white text-[#181725] flex flex-col font-sans selection:bg-[#53B175]/30">
+      {/* Toast Notification Floating Container */}
+      <ToastContainer />
+
       {/* Desktop Header Navbar */}
       <NavbarDesktop
         activeTab={activeTab}
