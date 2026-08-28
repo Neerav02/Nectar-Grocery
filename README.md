@@ -5,69 +5,145 @@
 [![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4.0-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Zustand](https://img.shields.io/badge/State-Zustand%20v4-764ABC?logo=redux&logoColor=white)](https://zustand-demo.pmnd.rs/)
-[![Build Status](https://img.shields.io/badge/Build-Passing-53B175)](https://github.com/)
+[![Build Status](https://img.shields.io/badge/Build-Passing-53B175)](https://github.com/Neerav02/Nectar-Grocery)
 
 A pixel-faithful, production-ready, mobile-first and desktop-adapted online grocery delivery application built from the 28-screen Nectar Grocery Figma design specification. Designed for ultra-high fidelity, seamless user experience, and robust asynchronous state management.
 
 ---
 
-## 📸 Executive Summary & Key Highlights
+## 🖼️ Visual Interface & Feature Showcase
 
-- 📱 **Mobile-First & Desktop Adapted**: Seamless transition from mobile bottom-sheet navigation to desktop sticky header navbar with 4-column product grids.
-- ⚡ **Engineering Challenge A (Stale Search Guard)**: Built-in `AbortController` cancellation + sequence token validation preventing out-of-order API race conditions with an interactive debug panel.
-- 🛒 **Engineering Challenge B (Persisted Cart Resilience)**: Auto-synchronization on reload protecting against catalog price shifts, out-of-stock bounds, and deleted items without UI crashes.
-- 🚚 **Real-Time Live Order Tracking**: Interactive 4-step progress stepper (**Order Placed ➔ Packing ➔ Out for Delivery ➔ Delivered**) with automated status progression timers and delivery partner dispatch.
-- 💳 **Single-Card Checkout Modal**: Wide `maxWidth="xl"` scroll-free card displaying verified delivery address, express vs standard delivery options, UPI/Card/COD payment gateways, promo codes, and itemized bill breakdown.
-
----
-
-## 🛠️ Technology Stack & Architecture
-
-### Core Technologies
-| Layer | Technology | Purpose |
-| :--- | :--- | :--- |
-| **UI Framework** | React 18.3 | Concurrent UI rendering & hooks architecture |
-| **Build Tooling** | Vite 8.2 | Lightning-fast HMR and optimized production bundling |
-| **Language** | TypeScript 5.6 (Strict Mode) | Full type safety with zero `any` usage |
-| **Styling** | Tailwind CSS v4 + Vanilla CSS | Modern utility classes, glassmorphic modals, custom scrollbars |
-| **State Management**| Zustand v4 + Persist Middleware | Modular stores (`cart`, `auth`, `orders`, `search`, `favorites`, `filter`) |
-| **Icons** | Lucide React | Clean, responsive UI icon system |
+| Screen | Preview | Description |
+| :--- | :---: | :--- |
+| **Home Shop** | <img src="public/design-references/Home%20Screen.png" width="220" alt="Home Screen"/> | Auto-rotating hero banners, exclusive offers slider, best sellers grid, live order counter. |
+| **Explore Categories** | <img src="public/design-references/Explore.png" width="220" alt="Explore Screen"/> | 2-column pastel category tiles with custom hue borders and instant filter triggers. |
+| **Search & Filtering** | <img src="public/design-references/Search.png" width="220" alt="Search Screen"/> | Instant debounced search with removable active filter badges and draft filter drawer. |
+| **Product Detail** | <img src="public/design-references/Product%20Detail.png" width="220" alt="Product Detail"/> | Photo stage, unit price calculator, quantity stepper, expandable nutritional facts accordion. |
+| **Cart & Checkout** | <img src="public/design-references/My%20Cart.png" width="220" alt="My Cart Screen"/> | Itemized cart list, swipe-to-delete, sticky subtotal, single-card checkout modal (`maxWidth="xl"`). |
+| **Order Tracking** | <img src="public/design-references/order%20accepted.png" width="220" alt="Order Success Screen"/> | Order success celebration, live 4-step progress stepper, delivery partner dispatch. |
 
 ---
 
-## 📐 System Architecture & Data Flow
+## 🏛️ System Architecture & Data Flow
+
+The application follows a clean unidirectional data flow architecture powered by modular **Zustand stores** and a simulated asynchronous API layer with variable latency.
 
 ```mermaid
 flowchart TD
-    subgraph UI Layer
-        MD[Desktop Header Navbar]
-        MB[Mobile Bottom Tab Bar]
-        P[Pages: Shop, Explore, Cart, Favourites, Account]
-        MODALS[Checkout, Auth, Filter, Location, Order Status]
+    subgraph UI ["🖥️ UI & View Layer"]
+        NAV["Desktop Top Header Navbar"]
+        TAB["Mobile Bottom Tab Bar"]
+        P_SHOP["Shop Home Page"]
+        P_EXPLORE["Explore Categories Page"]
+        P_SEARCH["Search & Dynamic Filter Engine"]
+        P_CART["Cart Page"]
+        P_ACCOUNT["Account & Live Tracking Dashboard"]
+        M_CHECKOUT["Single-Card Checkout Modal"]
     end
 
-    subgraph State Management Layer (Zustand Stores)
-        UC[useCartStore - Persisted]
-        US[useSearchStore - AbortController]
-        UO[useOrderStore - Persisted]
-        UA[useAuthStore - Persisted]
-        UF[useFilterStore]
-        UV[useFavoritesStore]
+    subgraph STATE ["⚡ State Management (Zustand Stores)"]
+        STORE_CART["useCartStore (Persisted in LocalStorage)"]
+        STORE_SEARCH["useSearchStore (AbortController Protection)"]
+        STORE_ORDER["useOrderStore (Live Stepper & Status)"]
+        STORE_AUTH["useAuthStore (User Session State)"]
+        STORE_FILTER["useFilterStore (Draft Filters)"]
+        STORE_FAV["useFavoritesStore (Wishlist State)"]
     end
 
-    subgraph Data & Async Layer
-        MOCK[Mock API Engine - Variable Latency 200-1200ms]
-        CATALOG[Static Product & Category Catalog JSON]
-        LS[(Browser LocalStorage)]
+    subgraph ASYNC ["🔄 Async Data & Mock API Engine"]
+        API["Mock API Layer (200ms - 1200ms Latency)"]
+        CATALOG["Static Products & Categories JSON"]
+        STORAGE[("Browser LocalStorage")]
     end
 
-    P --> UC & US & UO & UA & UF & UV
-    MODALS --> UC & UO & UA
-    US <--> MOCK <--> CATALOG
-    UC <--> LS
-    UO <--> LS
-    UA <--> LS
+    P_SHOP --> NAV & TAB
+    P_SEARCH --> STORE_SEARCH <--> API <--> CATALOG
+    P_CART --> STORE_CART <--> STORAGE
+    M_CHECKOUT --> STORE_ORDER <--> STORAGE
+    STORE_AUTH <--> STORAGE
 ```
+
+---
+
+## 🔄 User Workflow & Step-by-Step Lifecycle
+
+```
+[ Splash Screen ] (Auto 1.5s Timer)
+        │
+        ▼
+[ Onboarding Carousel ] ──(Click "Get Started")──► [ Sign In Welcome Screen ]
+                                                          │
+          ┌───────────────────────────────────────────────┼──────────────────────────────┐
+          ▼                                               ▼                              ▼
+  [ Mobile OTP Login ]                           [ Continue with Email ]         [ Social Auth (Google/FB) ]
+          │                                               │                              │
+          ▼                                               ▼                              ▼
+  [ OTP Verification ]                           [ Email Login Screen ]          [ Immediate Session Login ]
+          │                                               │                              │
+          ▼                                               └──────────────┬───────────────┘
+  [ Select Location ]                                                    │
+          │                                                              ▼
+          └───────────────────────────────────────────────► [ Main Shop Page ] ◄────────────────┐
+                                                                 │                              │
+                  ┌──────────────────────────────────────────────┼──────────────────────┐       │
+                  ▼                                              ▼                      ▼       │
+          [ Browse Banners ]                             [ Search Products ]     [ Filter Categories ]
+                  │                                              │                      │
+                  └───────────────────────┬──────────────────────┘                      │
+                                          ▼                                             │
+                              [ Product Detail View ]                                   │
+                                          │                                             │
+                                          ▼                                             │
+                              [ Add to Cart & Checkout ]                                │
+                                          │                                             │
+                                          ▼                                             │
+                             [ Single-Card Checkout Modal ]                             │
+                                          │                                             │
+                                          ▼                                             │
+                             [ Order Success Screen ]                                   │
+                                          │                                             │
+                                          ▼                                             │
+                             [ Profile & Live Tracking ] ───────────────────────────────┘
+```
+
+---
+
+## 🛠️ Technology Stack & Dependencies
+
+### Core Frameworks & Tooling
+- **Core Library**: React 18.3.1
+- **Build Engine**: Vite 8.2.2 (Ultra-fast HMR and optimized production bundle)
+- **Language**: TypeScript 5.6.3 Strict Mode (100% type safety, zero `any`)
+- **Styling**: Tailwind CSS v4 + Custom Vanilla CSS (Design system, custom scrollbars, animations)
+- **State Engine**: Zustand v4 + `persist` middleware
+- **Icons**: Lucide React
+
+---
+
+## ⚡ Engineering Challenges & Technical Solutions
+
+### Challenge A: Stale Search Response Protection
+- **Problem**: Out-of-order asynchronous network responses during rapid typing (e.g., Query A `"milk"` with 1200ms delay vs. Query B `"apple"` with 200ms delay). If Query B returns first, Query A's late resolution would overwrite the UI with stale `"milk"` results while the search bar shows `"apple"`.
+- **Solution**:
+  1. Implemented `AbortController.abort()` to cancel pending requests on new keypresses.
+  2. Implemented `activeRequestId` token matching inside `useSearchStore.ts`.
+  3. Created an interactive **Stale Search Debug Panel** directly on the Search page, enabling reviewers to trigger race condition tests and toggle protection ON/OFF in real time.
+
+### Challenge B: Persisted Cart Consistency
+- **Problem**: Cart items persisted in `localStorage` across reloads may become invalid if product prices, availability, or stock metadata change between browser sessions.
+- **Solution**:
+  1. On application mount, `validateAndSyncCart()` in `useCartStore.ts` validates saved items against the live product catalog.
+  2. Discontinued products are safely removed with user notification toasts.
+  3. Price changes automatically update cart subtotals while displaying warning badges (`Price updated from $X to $Y`).
+  4. Out-of-stock items automatically cap quantities to available limits without UI crashes.
+
+---
+
+## 🖥️ Desktop Adaptation Strategy
+
+1. **Sticky Desktop Top Navbar (`NavbarDesktop`)**: Replaces the mobile bottom bar on desktop viewports (`≥ 768px`) with logo lockup, location selector, central search bar, section tabs (`Shop`, `Explore`), and badge indicators for Cart (`🛒`) and Favourites (`♡`).
+2. **Multi-Column Responsive Product Grid**: Dynamic 2-column (mobile) ➔ 3-column (tablet) ➔ 4-column (desktop) layout within a `max-w-7xl` container.
+3. **Single-Card Desktop Checkout Modal (`maxWidth="xl"`)**: Converts mobile bottom sheets into an expanded `max-w-2xl` scroll-free floating card dialog.
 
 ---
 
@@ -79,24 +155,24 @@ flowchart TD
 
 ### Installation Commands
 
-1. **Clone & Navigate:**
+1. **Clone Repository & Navigate:**
    ```bash
-   git clone <repository-url>
-   cd nectar-grocery-app
+   git clone https://github.com/Neerav02/Nectar-Grocery.git
+   cd Nectar-Grocery
    ```
 
-2. **Install Dependencies:**
+2. **Install Project Dependencies:**
    ```bash
    npm install
    ```
 
-3. **Launch Local Development Server:**
+3. **Start Local Development Server:**
    ```bash
    npm run dev
    ```
    Open `http://localhost:5173` in your browser.
 
-4. **Verify TypeScript Strict Compilation:**
+4. **Run TypeScript Strict Compiler Verification:**
    ```bash
    npx tsc --noEmit
    ```
@@ -108,32 +184,13 @@ flowchart TD
 
 ---
 
-## ⚡ Engineering Challenges & Solutions
-
-### Challenge A: Stale Search Response Protection
-- **Problem**: Variable network latency (200ms–1200ms) causes fast subsequent requests (e.g. searching "apple") to complete *before* older slow requests (e.g. searching "milk"), causing stale results to overwrite the UI.
-- **Solution**:
-  1. Utilized `AbortController` to cancel ongoing HTTP requests upon typing a new query.
-  2. Implemented `activeRequestId` token matching in `useSearchStore.ts`.
-  3. Built an interactive **Stale Search Debug Panel** on the Search page allowing reviewers to simulate race conditions and toggle protection ON/OFF.
-
-### Challenge B: Persisted Cart Consistency
-- **Problem**: Cart items persisted in `localStorage` can become stale if catalog prices or stock availability change between browser sessions.
-- **Solution**:
-  1. On mount, `validateAndSyncCart()` compares persisted items against current catalog metadata.
-  2. Discontinued products are safely removed with user notification toasts.
-  3. Price changes update cart totals while displaying warning badges (`Price updated from $X to $Y`).
-  4. Stock bounds automatically adjust quantity without throwing runtime errors.
-
----
-
 ## 📁 Repository Directory Structure
 
 ```
 nectar-grocery-app/
 ├── public/
-│   ├── images/                # High-res grocery assets & category banners
-│   ├── design-references/     # Original Figma reference screenshots
+│   ├── design-references/     # Original Figma reference screenshots (28 screens)
+│   ├── images/                # High-definition grocery product & banner assets
 │   └── favicon.ico
 ├── src/
 │   ├── api/
@@ -165,17 +222,17 @@ nectar-grocery-app/
 
 ---
 
-## 📄 Documentation Submissions Summary
+## 📑 Required Assignment Documentation
 
-1. [`DESIGN_NOTES.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/DESIGN_NOTES.md): 3 desktop layout adaptation decisions and responsive rationale.
-2. [`DECISIONS.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/DECISIONS.md): 3 architectural trade-offs including stale search protection and cart resilience.
-3. [`PROMPT_LOG.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/PROMPT_LOG.md): AI prompt log and human supervision corrections (Figma copy typos & async race condition guards).
-4. [`DEBUGGING.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/DEBUGGING.md): Real troubleshooting logs (TypeScript CSS side-effect imports & Vite HTML script entry resolution).
+- [`DESIGN_NOTES.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/DESIGN_NOTES.md): 3 desktop layout adaptation decisions and responsive rationale.
+- [`DECISIONS.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/DECISIONS.md): 3 architectural trade-offs including stale search protection and cart resilience.
+- [`PROMPT_LOG.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/PROMPT_LOG.md): AI prompt log and human supervision corrections (Figma copy typos & async race condition guards).
+- [`DEBUGGING.md`](file:///d:/Ahoum%20Labs/nectar-grocery-app/DEBUGGING.md): Real troubleshooting logs (TypeScript CSS side-effect imports & Vite HTML script entry resolution).
 
 ---
 
 ## 🔮 Future Enhancements
 
-1. **GraphQL / WebSocket Sync**: Real-time WebSocket connection for live delivery driver GPS map tracking.
-2. **End-to-End Testing**: Integration of Playwright E2E test suites for automated cart resilience assertion.
-3. **PWA & Offline Service Worker**: Offline asset caching and push notifications for order delivery updates.
+1. **GraphQL / WebSocket Driver Tracking**: Real-time WebSocket connection for live delivery driver GPS map updates.
+2. **Automated E2E Testing Suite**: Playwright testing for stale search aborts and cart persistence under price changes.
+3. **PWA Offline Mode**: Service worker asset caching for offline grocery shopping support.
