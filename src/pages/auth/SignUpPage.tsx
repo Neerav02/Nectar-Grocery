@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Check, Eye, EyeOff } from 'lucide-react';
 import { PillButton } from '../../components/common/PillButton';
-import { CarrotLogo } from '../../components/common/CarrotLogo';
 
 interface SignUpPageProps {
   onBack: () => void;
@@ -34,7 +33,8 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onGoT
 
         {/* Header with Carrot Logo */}
         <div className="flex flex-col items-center text-center my-4">
-          <CarrotLogo variant="color" className="w-12 h-14 mb-6" />
+          {/* White background — use ICON_1.png */}
+          <img src="/images/ICON_1.png" alt="Nectar Logo" className="w-12 h-14 object-contain mb-6" />
 
           <h2 className="text-2xl font-extrabold text-[#181725] mb-2">Sign Up</h2>
           <p className="text-sm font-medium text-[#7C7C7C]">Enter your credentials to continue</p>

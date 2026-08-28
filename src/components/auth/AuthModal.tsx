@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Check, LogIn, PhoneCall } from 'lucide-react';
-import { CarrotLogo } from '../common/CarrotLogo';
 import { BottomSheet } from '../common/BottomSheet';
 import { PillButton } from '../common/PillButton';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -54,9 +53,8 @@ export const AuthModal: React.FC = () => {
         </div>
       ) : (
         <div className="py-2">
-          {/* Header Lockup */}
           <div className="flex flex-col items-center text-center mb-6">
-            <CarrotLogo variant="color" className="w-10 h-12 mb-3" />
+            <img src="/images/ICON_1.png" alt="Nectar Logo" className="w-10 h-12 object-contain mb-3" />
             <h3 className="text-2xl font-extrabold text-[#181725]">
               {mode === 'login' ? 'Log In' : mode === 'signup' ? 'Sign Up' : 'Enter your mobile number'}
             </h3>

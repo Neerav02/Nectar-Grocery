@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Search, X, SlidersHorizontal, AlertCircle } from 'lucide-react';
 import { ProductGrid } from '../components/product/ProductGrid';
-import { StaleSearchDebugPanel } from '../components/search/StaleSearchDebugPanel';
 import { EmptyState } from '../components/common/EmptyState';
 import { Product } from '../types';
 import { useSearchStore } from '../stores/useSearchStore';
@@ -19,7 +18,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct }) => {
   const appliedFilters = useFilterStore((state) => state.appliedFilters);
 
   // Debounced search effect
-  useEffect(() => {
+  React.useEffect(() => {
     const timer = setTimeout(() => {
       if (query.trim()) {
         executeSearch(query);
@@ -49,7 +48,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct }) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search store, eggs, milk, cola..."
+            placeholder="Search store, fruits, vegetables..."
             autoFocus
             className="w-full bg-[#F2F3F2] focus:bg-white h-13 pl-12 pr-10 rounded-2xl text-sm font-bold text-[#181725] outline-none border-2 border-transparent focus:border-[#53B175] transition-all"
           />
@@ -76,9 +75,6 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct }) => {
         </button>
       </div>
 
-      {/* Interactive Challenge A Debug Mode Panel */}
-      <StaleSearchDebugPanel />
-
       {/* Error state */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl flex items-center space-x-3">
@@ -87,16 +83,16 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct }) => {
         </div>
       )}
 
-      {/* Results grid */}
+      {/* Results */}
       {!query.trim() ? (
         <EmptyState
           title="Search Nectar Store"
-          description="Type 'egg', 'milk', 'cola', or 'apple' above to test search results and stale request protection."
+          description="Search for fresh fruits, vegetables, dairy, beverages and more."
         />
       ) : filteredResults.length === 0 && !isLoading ? (
         <EmptyState
           title="No Products Found"
-          description={`We couldn't find any products matching "${query}". Try searching for another item or clearing your filters.`}
+          description={`We couldn't find any products matching "${query}". Try another search term.`}
           actionText="Clear Search"
           onAction={resetSearch}
         />

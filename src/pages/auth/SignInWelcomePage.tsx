@@ -12,61 +12,75 @@ export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
   onFacebookSignIn,
 }) => {
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-between max-w-md mx-auto shadow-2xl overflow-hidden animate-fade-in">
-      {/* Top Hero Section with Fresh Vegetables Illustration */}
-      <div className="relative h-64 w-full bg-slate-50 overflow-hidden">
+    <div className="fixed inset-0 bg-white flex flex-col max-w-md mx-auto shadow-2xl animate-fade-in overflow-hidden">
+      {/* Top Hero — fresh vegetables banner */}
+      <div className="relative flex-shrink-0" style={{ height: '45vh' }}>
         <img
           src="/images/signin_bg.png"
           alt="Fresh Groceries"
-          className="w-full h-full object-cover object-top filter drop-shadow-sm"
+          className="w-full h-full object-cover object-top"
         />
+        {/* Fade gradient into white content below */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
       </div>
 
-      {/* Main Content Area */}
-      <div className="p-6 flex-1 flex flex-col justify-between -mt-6 bg-white rounded-t-3xl z-10">
+      {/* Content Card — fits remaining screen height */}
+      <div className="flex-1 flex flex-col justify-between px-6 pt-2 pb-8 bg-white">
+        {/* Headline */}
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#181725] leading-tight mb-6">
-            Get your groceries <br /> with nectar
+          <h2 className="text-2xl font-extrabold text-[#181725] leading-snug mb-5">
+            Get your groceries <br />
+            <span className="text-[#53B175]">with nectar</span>
           </h2>
 
-          {/* Mobile Number Input Trigger */}
+          {/* Phone Number Trigger Row */}
           <div
+            role="button"
+            tabIndex={0}
             onClick={onSelectPhone}
-            className="flex items-center space-x-3 border-b-2 border-[#E2E2E2] hover:border-[#53B175] py-3 cursor-pointer transition-colors"
+            onKeyDown={(e) => e.key === 'Enter' && onSelectPhone()}
+            className="flex items-center gap-3 border-b-2 border-[#E2E2E2] hover:border-[#53B175] py-3 cursor-pointer transition-colors rounded-none"
           >
-            <span className="text-xl">🇧🇩</span>
-            <span className="font-bold text-[#181725] text-base">+880</span>
-            <span className="text-[#7C7C7C] text-sm font-medium ml-2">Enter phone number</span>
+            <span className="text-2xl">🇮🇳</span>
+            <span className="font-bold text-[#181725] text-base">+91</span>
+            <span className="text-[#7C7C7C] text-sm font-medium flex-1">
+              Enter your phone number
+            </span>
+            <svg className="w-4 h-4 text-[#7C7C7C]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </div>
         </div>
 
-        {/* Social Connection Options */}
-        <div className="space-y-4 my-8">
-          <p className="text-center text-xs font-bold text-[#7C7C7C] tracking-wide">
-            Or connect with social media
+        {/* Social Options */}
+        <div className="space-y-3">
+          <p className="text-center text-xs font-bold text-[#7C7C7C] tracking-wide uppercase">
+            Or connect with
           </p>
 
+          {/* Google */}
           <button
             type="button"
             onClick={onGoogleSignIn}
-            className="w-full h-14 bg-[#5383EC] hover:bg-[#4273DF] text-white font-semibold text-base rounded-2xl flex items-center justify-between px-6 transition-all shadow-sm active:scale-[0.99]"
+            className="w-full h-14 bg-[#5383EC] hover:bg-[#4273DF] active:scale-[0.99] text-white font-bold text-base rounded-2xl flex items-center justify-between px-5 transition-all shadow-sm"
           >
-            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#5383EC] text-base">
+            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#5383EC] text-sm flex-shrink-0">
               G
             </div>
-            <span className="flex-1 text-center font-bold">Continue with Google</span>
+            <span className="flex-1 text-center">Continue with Google</span>
             <div className="w-7" />
           </button>
 
+          {/* Facebook */}
           <button
             type="button"
             onClick={onFacebookSignIn}
-            className="w-full h-14 bg-[#4A66AC] hover:bg-[#3B5495] text-white font-semibold text-base rounded-2xl flex items-center justify-between px-6 transition-all shadow-sm active:scale-[0.99]"
+            className="w-full h-14 bg-[#4A66AC] hover:bg-[#3B5495] active:scale-[0.99] text-white font-bold text-base rounded-2xl flex items-center justify-between px-5 transition-all shadow-sm"
           >
-            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#4A66AC] text-base">
+            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center font-black text-[#4A66AC] text-sm flex-shrink-0">
               f
             </div>
-            <span className="flex-1 text-center font-bold">Continue with Facebook</span>
+            <span className="flex-1 text-center">Continue with Facebook</span>
             <div className="w-7" />
           </button>
         </div>
