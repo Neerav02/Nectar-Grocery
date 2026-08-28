@@ -28,8 +28,6 @@ export const NavbarDesktop: React.FC<NavbarDesktopProps> = ({
   const navLinks: { id: TabType; label: string }[] = [
     { id: 'shop', label: 'Shop' },
     { id: 'explore', label: 'Explore' },
-    { id: 'cart', label: 'Cart' },
-    { id: 'favourite', label: 'Favourites' },
   ];
 
   return (
