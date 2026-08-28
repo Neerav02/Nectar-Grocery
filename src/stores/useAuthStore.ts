@@ -24,9 +24,9 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       hasCompletedOnboarding: false,
       userLocation: {
-        zone: 'Banasree',
-        area: 'Block C, Dhaka',
-        city: 'Dhaka',
+        zone: 'Bengaluru',
+        area: 'Indiranagar, Bengaluru',
+        city: 'Bengaluru',
       },
       userProfile: null,
       isAuthenticated: false,
@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthState>()(
           userProfile: {
             name,
             email,
-            phone: '+880 1712 345678',
+            phone: '+91 98765 43210',
           },
           isAuthModalOpen: false,
         }),

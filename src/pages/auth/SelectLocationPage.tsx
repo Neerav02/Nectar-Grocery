@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ArrowLeft, ChevronDown, MapPin } from 'lucide-react';
 import { PillButton } from '../../components/common/PillButton';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { INDIAN_LOCATION_ZONES } from '../../data/indianLocations';
 
 interface SelectLocationPageProps {
   onBack: () => void;
@@ -11,12 +12,37 @@ interface SelectLocationPageProps {
 export const SelectLocationPage: React.FC<SelectLocationPageProps> = ({ onBack, onSubmit }) => {
   const { userLocation, setUserLocation } = useAuthStore();
 
-  const [zone, setZone] = useState(userLocation.zone || 'Banasree');
-  const [area, setArea] = useState(userLocation.area || 'Block C');
+  const [selectedZoneName, setSelectedZoneName] = useState(
+    userLocation.zone || INDIAN_LOCATION_ZONES[0].name
+  );
+
+  const activeZoneObj = useMemo(() => {
+    return (
+      INDIAN_LOCATION_ZONES.find((z) => z.name === selectedZoneName) || INDIAN_LOCATION_ZONES[0]
+    );
+  }, [selectedZoneName]);
+
+  const [selectedArea, setSelectedArea] = useState(
+    userLocation.area || activeZoneObj.areas[0]
+  );
+
+  // When Zone changes, update default Area to first area in the zone
+  const handleZoneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newZoneName = e.target.value;
+    setSelectedZoneName(newZoneName);
+    const newZoneObj = INDIAN_LOCATION_ZONES.find((z) => z.name === newZoneName);
+    if (newZoneObj && newZoneObj.areas.length > 0) {
+      setSelectedArea(newZoneObj.areas[0]);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setUserLocation({ zone, area, city: 'Dhaka' });
+    setUserLocation({
+      zone: selectedZoneName,
+      area: `${selectedArea}, ${selectedZoneName}`,
+      city: selectedZoneName,
+    });
     onSubmit();
   };
 
@@ -50,39 +76,43 @@ export const SelectLocationPage: React.FC<SelectLocationPageProps> = ({ onBack, 
 
         {/* Location Dropdowns Form */}
         <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+          {/* Zone Dropdown */}
           <div>
             <label className="block text-xs font-bold text-[#7C7C7C] uppercase tracking-wider mb-2">
-              Your Zone
+              Your Zone / City
             </label>
             <div className="relative flex items-center border-b-2 border-[#E2E2E2] focus-within:border-[#53B175] py-2 transition-colors">
               <select
-                value={zone}
-                onChange={(e) => setZone(e.target.value)}
+                value={selectedZoneName}
+                onChange={handleZoneChange}
                 className="w-full font-bold text-[#181725] text-base outline-none bg-transparent appearance-none cursor-pointer pr-8"
               >
-                <option value="Banasree">Banasree</option>
-                <option value="Gulshan">Gulshan</option>
-                <option value="Dhanmondi">Dhanmondi</option>
-                <option value="Uttara">Uttara</option>
+                {INDIAN_LOCATION_ZONES.map((z) => (
+                  <option key={z.id} value={z.name}>
+                    {z.name} ({z.state})
+                  </option>
+                ))}
               </select>
               <ChevronDown className="w-5 h-5 text-gray-400 absolute right-1 pointer-events-none" />
             </div>
           </div>
 
+          {/* Area Dropdown */}
           <div>
             <label className="block text-xs font-bold text-[#7C7C7C] uppercase tracking-wider mb-2">
-              Your Area
+              Your Area / Locality
             </label>
             <div className="relative flex items-center border-b-2 border-[#E2E2E2] focus-within:border-[#53B175] py-2 transition-colors">
               <select
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                className="w-full font-bold text-[#7C7C7C] focus:text-[#181725] text-base outline-none bg-transparent appearance-none cursor-pointer pr-8"
+                value={selectedArea}
+                onChange={(e) => setSelectedArea(e.target.value)}
+                className="w-full font-bold text-[#181725] text-base outline-none bg-transparent appearance-none cursor-pointer pr-8"
               >
-                <option value="Types of your area">Types of your area</option>
-                <option value="Block C">Block C</option>
-                <option value="Block E">Block E</option>
-                <option value="Block A">Block A</option>
+                {activeZoneObj.areas.map((areaName) => (
+                  <option key={areaName} value={areaName}>
+                    {areaName}
+                  </option>
+                ))}
               </select>
               <ChevronDown className="w-5 h-5 text-gray-400 absolute right-1 pointer-events-none" />
             </div>
