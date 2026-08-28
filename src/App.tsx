@@ -102,6 +102,13 @@ export function App() {
   if (currentStep === 'signin_welcome') {
     return (
       <SignInWelcomePage
+        onBack={() => {
+          if (!hasCompletedOnboarding) {
+            setCurrentStep('onboarding');
+          } else {
+            setCurrentStep('main_app');
+          }
+        }}
         onSelectPhone={() => setCurrentStep('enter_phone')}
         onGoogleSignIn={handleCompleteAuthSequence}
         onFacebookSignIn={handleCompleteAuthSequence}

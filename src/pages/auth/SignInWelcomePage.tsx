@@ -1,20 +1,34 @@
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 
 interface SignInWelcomePageProps {
+  onBack?: () => void;
   onSelectPhone: () => void;
   onGoogleSignIn: () => void;
   onFacebookSignIn: () => void;
 }
 
 export const SignInWelcomePage: React.FC<SignInWelcomePageProps> = ({
+  onBack,
   onSelectPhone,
   onGoogleSignIn,
   onFacebookSignIn,
 }) => {
   return (
-    <div className="fixed inset-0 bg-white flex flex-col max-w-md mx-auto shadow-2xl animate-fade-in overflow-hidden">
+    <div className="fixed inset-0 bg-white flex flex-col max-w-md mx-auto shadow-2xl animate-fade-in overflow-hidden z-50">
       {/* Top Hero — fresh vegetables banner */}
       <div className="relative flex-shrink-0" style={{ height: '45vh' }}>
+        {/* Back Button */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            aria-label="Back"
+            className="absolute top-4 left-4 z-20 p-2.5 bg-white/80 hover:bg-white text-[#181725] backdrop-blur-md rounded-full shadow-md transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-[#53B175]"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+        )}
+
         <img
           src="/images/Login_Image.png"
           alt="Fresh Groceries"
