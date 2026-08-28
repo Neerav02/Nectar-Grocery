@@ -43,10 +43,8 @@ export function App() {
   const { hasCompletedOnboarding, isAuthenticated, setCompletedOnboarding, login, openAuthModal } =
     useAuthStore();
 
-  // Onboarding & Auth Flow Step State
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>(
-    !hasCompletedOnboarding ? 'splash' : 'main_app'
-  );
+  // Always start at 'splash' on every page refresh so Splash screen always displays first
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>('splash');
 
   // Active Main App Tab Navigation
   const [activeTab, setActiveTab] = useState<TabType>('shop');
@@ -60,6 +58,14 @@ export function App() {
   const [isOrderFailureOpen, setIsOrderFailureOpen] = useState(false);
 
   // Flow Step Handlers
+  const handleSplashFinish = () => {
+    if (!hasCompletedOnboarding) {
+      setCurrentStep('onboarding');
+    } else {
+      setCurrentStep('main_app');
+    }
+  };
+
   const handleCompleteAuthSequence = () => {
     login('user@nectar.com', 'Demo Customer');
     setCompletedOnboarding(true);
@@ -81,9 +87,9 @@ export function App() {
     setIsCheckoutOpen(true);
   };
 
-  // 1. Splash Screen
+  // 1. Splash Screen (Plays on every page refresh for 1.8s)
   if (currentStep === 'splash') {
-    return <SplashPage onFinish={() => setCurrentStep('onboarding')} />;
+    return <SplashPage onFinish={handleSplashFinish} />;
   }
 
   // 2. Onboarding Page (Delivery Person Photo + Logo)
@@ -179,7 +185,7 @@ export function App() {
       />
 
       {/* Main Responsive Content Shell */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-20 md:pb-8">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-24 md:pb-12">
         <div className="max-w-md mx-auto md:max-w-none">
           {selectedProduct ? (
             <ProductDetailPage
