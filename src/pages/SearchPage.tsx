@@ -1,9 +1,9 @@
 import React from 'react';
-import { Search, X, SlidersHorizontal, AlertCircle } from 'lucide-react';
+import { Search, X, SlidersHorizontal, AlertCircle, FilterX } from 'lucide-react';
 import { ProductGrid } from '../components/product/ProductGrid';
 import { EmptyState } from '../components/common/EmptyState';
 import { Category, Product } from '../types';
-import { INITIAL_CATEGORIES } from '../api/productsData';
+import { INITIAL_CATEGORIES, INITIAL_PRODUCTS } from '../api/productsData';
 import { useSearchStore } from '../stores/useSearchStore';
 import { useFilterStore } from '../stores/useFilterStore';
 
@@ -16,8 +16,17 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
   const { query, setQuery, results, isLoading, error, executeSearch, resetSearch } =
     useSearchStore();
 
-  const openFilterSheet = useFilterStore((state) => state.openFilterSheet);
-  const appliedFilters = useFilterStore((state) => state.appliedFilters);
+  const {
+    openFilterSheet,
+    appliedFilters,
+    toggleDraftCategory,
+    toggleDraftBrand,
+    toggleDraftPriceRange,
+    toggleDraftDietary,
+    setDraftMinRating,
+    applyFilters,
+    resetFilters,
+  } = useFilterStore();
 
   // Debounced search effect
   React.useEffect(() => {
@@ -30,24 +39,39 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
     return () => clearTimeout(timer);
   }, [query, executeSearch]);
 
-  // Apply all filter criteria on results
-  let filteredResults = results;
-  if (appliedFilters.brands.length > 0) {
-    filteredResults = filteredResults.filter((p) => appliedFilters.brands.includes(p.brand));
-  }
+  const hasActiveFilters =
+    appliedFilters.brands.length > 0 ||
+    appliedFilters.categories.length > 0 ||
+    appliedFilters.priceRanges.length > 0 ||
+    appliedFilters.dietary.length > 0 ||
+    appliedFilters.minRating > 0;
+
+  // Base list of products: if query is set use API results; if query is empty use catalog products
+  const baseProducts = query.trim() ? results : INITIAL_PRODUCTS;
+
+  // Apply all filter criteria on baseProducts
+  let filteredResults = baseProducts;
+
   if (appliedFilters.categories.length > 0) {
     filteredResults = filteredResults.filter((p) =>
       appliedFilters.categories.includes(p.categoryId)
     );
   }
+
+  if (appliedFilters.brands.length > 0) {
+    filteredResults = filteredResults.filter((p) => appliedFilters.brands.includes(p.brand));
+  }
+
   if (appliedFilters.dietary.length > 0) {
     if (appliedFilters.dietary.includes('Organic Certified')) {
       filteredResults = filteredResults.filter((p) => p.nutritionInfo?.organic);
     }
   }
+
   if (appliedFilters.minRating > 0) {
     filteredResults = filteredResults.filter((p) => p.rating >= appliedFilters.minRating);
   }
+
   if (appliedFilters.priceRanges.length > 0) {
     filteredResults = filteredResults.filter((p) =>
       appliedFilters.priceRanges.some((range) => {
@@ -60,12 +84,33 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
     );
   }
 
-  const hasActiveFilters =
-    appliedFilters.brands.length > 0 ||
-    appliedFilters.categories.length > 0 ||
-    appliedFilters.priceRanges.length > 0 ||
-    appliedFilters.dietary.length > 0 ||
-    appliedFilters.minRating > 0;
+  const showFilteredProductsView = query.trim().length > 0 || hasActiveFilters;
+
+  // Helper functions to remove individual filters
+  const removeCategoryFilter = (catId: string) => {
+    toggleDraftCategory(catId);
+    applyFilters();
+  };
+
+  const removeBrandFilter = (brandName: string) => {
+    toggleDraftBrand(brandName);
+    applyFilters();
+  };
+
+  const removePriceFilter = (rangeKey: string) => {
+    toggleDraftPriceRange(rangeKey);
+    applyFilters();
+  };
+
+  const removeDietaryFilter = (item: string) => {
+    toggleDraftDietary(item);
+    applyFilters();
+  };
+
+  const removeRatingFilter = () => {
+    setDraftMinRating(0);
+    applyFilters();
+  };
 
   return (
     <div className="space-y-6 pb-24 md:pb-12 animate-fade-in">
@@ -108,6 +153,91 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
         </button>
       </div>
 
+      {/* ── Active Filter Badges Bar ── */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap items-center gap-2 p-3 bg-[#EEF8F2]/60 border border-[#53B175]/30 rounded-2xl">
+          <span className="text-xs font-extrabold text-[#53B175] uppercase tracking-wider mr-1">
+            Active Filters:
+          </span>
+
+          {appliedFilters.categories.map((catId) => {
+            const catObj = INITIAL_CATEGORIES.find((c) => c.id === catId);
+            return (
+              <span
+                key={catId}
+                className="inline-flex items-center space-x-1.5 bg-[#53B175] text-white text-xs font-bold px-3 py-1 rounded-xl shadow-2xs"
+              >
+                <span>{catObj?.name || catId}</span>
+                <button onClick={() => removeCategoryFilter(catId)} aria-label="Remove category">
+                  <X className="w-3.5 h-3.5 stroke-[3] hover:opacity-80" />
+                </button>
+              </span>
+            );
+          })}
+
+          {appliedFilters.priceRanges.map((rangeKey) => (
+            <span
+              key={rangeKey}
+              className="inline-flex items-center space-x-1.5 bg-[#53B175] text-white text-xs font-bold px-3 py-1 rounded-xl shadow-2xs"
+            >
+              <span>
+                {rangeKey === 'under_2'
+                  ? 'Under $2'
+                  : rangeKey === '2_to_5'
+                  ? '$2 - $5'
+                  : rangeKey === '5_to_10'
+                  ? '$5 - $10'
+                  : '$10+'}
+              </span>
+              <button onClick={() => removePriceFilter(rangeKey)} aria-label="Remove price filter">
+                <X className="w-3.5 h-3.5 stroke-[3] hover:opacity-80" />
+              </button>
+            </span>
+          ))}
+
+          {appliedFilters.dietary.map((item) => (
+            <span
+              key={item}
+              className="inline-flex items-center space-x-1.5 bg-[#53B175] text-white text-xs font-bold px-3 py-1 rounded-xl shadow-2xs"
+            >
+              <span>{item}</span>
+              <button onClick={() => removeDietaryFilter(item)} aria-label="Remove dietary filter">
+                <X className="w-3.5 h-3.5 stroke-[3] hover:opacity-80" />
+              </button>
+            </span>
+          ))}
+
+          {appliedFilters.minRating > 0 && (
+            <span className="inline-flex items-center space-x-1.5 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-2xs">
+              <span>{appliedFilters.minRating}★ & above</span>
+              <button onClick={removeRatingFilter} aria-label="Remove rating filter">
+                <X className="w-3.5 h-3.5 stroke-[3] hover:opacity-80" />
+              </button>
+            </span>
+          )}
+
+          {appliedFilters.brands.map((brand) => (
+            <span
+              key={brand}
+              className="inline-flex items-center space-x-1.5 bg-[#53B175] text-white text-xs font-bold px-3 py-1 rounded-xl shadow-2xs"
+            >
+              <span>{brand}</span>
+              <button onClick={() => removeBrandFilter(brand)} aria-label="Remove brand filter">
+                <X className="w-3.5 h-3.5 stroke-[3] hover:opacity-80" />
+              </button>
+            </span>
+          ))}
+
+          <button
+            onClick={resetFilters}
+            className="flex items-center space-x-1 text-xs font-extrabold text-red-600 hover:bg-red-50 px-2.5 py-1 rounded-xl transition-colors ml-auto"
+          >
+            <FilterX className="w-3.5 h-3.5" />
+            <span>Reset All</span>
+          </button>
+        </div>
+      )}
+
       {/* Error state */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl flex items-center space-x-3">
@@ -117,8 +247,32 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
       )}
 
       {/* ── Content View ── */}
-      {!query.trim() ? (
-        /* ── Category Cards Grid (Find Products) ── */
+      {showFilteredProductsView ? (
+        filteredResults.length === 0 && !isLoading ? (
+          <EmptyState
+            title="No Matching Products"
+            description="We couldn't find any products matching your selected filters. Try clearing some filters."
+            actionText="Reset All Filters"
+            onAction={resetFilters}
+          />
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-extrabold text-[#181725]">
+                {query.trim()
+                  ? `Search Results for "${query}"`
+                  : `Filtered Products (${filteredResults.length})`}
+              </h2>
+            </div>
+            <ProductGrid
+              products={filteredResults}
+              isLoading={isLoading}
+              onSelectProduct={onSelectProduct}
+            />
+          </div>
+        )
+      ) : (
+        /* ── Default Category Cards Grid (Find Products) ── */
         <div className="space-y-4 pt-2">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-5">
             {INITIAL_CATEGORIES.map((cat) => (
@@ -149,19 +303,6 @@ export const SearchPage: React.FC<SearchPageProps> = ({ onSelectProduct, onSelec
             ))}
           </div>
         </div>
-      ) : filteredResults.length === 0 && !isLoading ? (
-        <EmptyState
-          title="No Products Found"
-          description={`We couldn't find any products matching "${query}". Try another search term.`}
-          actionText="Clear Search"
-          onAction={resetSearch}
-        />
-      ) : (
-        <ProductGrid
-          products={filteredResults}
-          isLoading={isLoading}
-          onSelectProduct={onSelectProduct}
-        />
       )}
     </div>
   );
