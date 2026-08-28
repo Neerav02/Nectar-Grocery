@@ -25,7 +25,7 @@ export const useAuthStore = create<AuthState>()(
       hasCompletedOnboarding: false,
       userLocation: {
         zone: 'Bengaluru',
-        area: 'Indiranagar, Bengaluru',
+        area: 'Indiranagar',
         city: 'Bengaluru',
       },
       userProfile: null,
