@@ -5,6 +5,7 @@
 [![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4.0-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Zustand](https://img.shields.io/badge/State-Zustand%20v4-764ABC?logo=redux&logoColor=white)](https://zustand-demo.pmnd.rs/)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-000000?logo=vercel&logoColor=white)](https://github.com/Neerav02/Nectar-Grocery)
 [![Build Status](https://img.shields.io/badge/Build-Passing-53B175)](https://github.com/Neerav02/Nectar-Grocery)
 
 A pixel-faithful, production-ready, mobile-first and desktop-adapted online grocery delivery application built from the 28-screen Nectar Grocery Figma design specification. Designed for ultra-high fidelity, seamless user experience, and robust asynchronous state management.
@@ -159,7 +160,30 @@ The project has been implemented to strictly satisfy 100% of the candidate assig
 
 ---
 
-## 🚀 Quick Start & Development Setup
+## 🌐 Live Vercel Deployment Instructions
+
+### Method 1: Import via Vercel Web Dashboard (Recommended - 1 Minute)
+1. Go to [vercel.com/new](https://vercel.com/new) and log in with your GitHub account.
+2. Under **Import Git Repository**, select **`Neerav02/Nectar-Grocery`**.
+3. Leave configuration as detected:
+   - **Framework Preset**: `Vite`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Click **Deploy**. Vercel will build the project and issue a live URL (e.g. `https://nectar-grocery-three.vercel.app`).
+
+### Method 2: Deploy via Vercel CLI (Terminal)
+1. Open terminal inside the project directory:
+   ```bash
+   npx vercel login
+   ```
+2. Run production deployment:
+   ```bash
+   npx vercel --prod
+   ```
+
+---
+
+## 🚀 Quick Start & Local Setup
 
 ### Prerequisites
 - **Node.js**: `v18.0.0` or higher (tested on `v22.20.0`)
@@ -226,6 +250,7 @@ nectar-grocery-app/
 ├── DECISIONS.md               # Architectural trade-off decisions
 ├── DEBUGGING.md               # Real-world debugging & troubleshooting log
 ├── PROMPT_LOG.md              # AI prompt supervision record & human corrections
+├── vercel.json                # Vercel SPA routing configuration
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
