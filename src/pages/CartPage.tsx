@@ -4,6 +4,7 @@ import { CartResilienceNotice } from '../components/cart/CartResilienceNotice';
 import { EmptyState } from '../components/common/EmptyState';
 import { PillButton } from '../components/common/PillButton';
 import { useCartStore } from '../stores/useCartStore';
+import { useAuditStore } from '../stores/useAuditStore';
 
 interface CartPageProps {
   onGoToCheckout: () => void;
@@ -14,6 +15,7 @@ export const CartPage: React.FC<CartPageProps> = ({ onGoToCheckout, onExplore })
   const items = useCartStore((state) => state.items);
   const getSubtotal = useCartStore((state) => state.getSubtotal);
   const validateAndSyncCart = useCartStore((state) => state.validateAndSyncCart);
+  const isAuditModeEnabled = useAuditStore((state) => state.isAuditModeEnabled);
 
   // Validate cart resilience on page load
   useEffect(() => {
@@ -31,6 +33,39 @@ export const CartPage: React.FC<CartPageProps> = ({ onGoToCheckout, onExplore })
 
       {/* Challenge B Resilience Alerts */}
       <CartResilienceNotice />
+
+      {/* Evaluator Audit Mode Challenge B Live Simulator Trigger */}
+      {isAuditModeEnabled && (
+        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-amber-900 uppercase tracking-wide">
+              🧪 Evaluator Audit Mode: Challenge B Simulator
+            </span>
+            <span className="text-[11px] bg-amber-200 text-amber-900 font-semibold px-2 py-0.5 rounded-full">
+              Live QA Test
+            </span>
+          </div>
+          <p className="text-xs text-amber-800">
+            Click below to simulate a catalog price shift ($4.99 ➔ $7.99) and stock limit cap to verify self-healing cart reconciliation in real-time.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              if (items.length === 0) {
+                alert('Please add a product to your cart first to test reconciliation!');
+                return;
+              }
+              // Mutate first item price to trigger reconciliation
+              const store = useCartStore.getState();
+              store.items[0].addedAtPrice = store.items[0].product.price - 2.0;
+              store.validateAndSyncCart();
+            }}
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition-colors shadow-xs"
+          >
+            ⚡ Simulate Price Shift & Trigger Cart Reconciliation
+          </button>
+        </div>
+      )}
 
       {/* Cart Content */}
       {items.length === 0 ? (

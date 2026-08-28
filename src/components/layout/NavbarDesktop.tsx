@@ -4,6 +4,7 @@ import { TabType } from '../../types';
 import { useCartStore } from '../../stores/useCartStore';
 import { useFavoritesStore } from '../../stores/useFavoritesStore';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { AuditModeBadge } from '../common/AuditModeBadge';
 import { clsx } from 'clsx';
 
 interface NavbarDesktopProps {
@@ -97,6 +98,9 @@ export const NavbarDesktop: React.FC<NavbarDesktopProps> = ({
 
         {/* Right Action Icons (Favourites, Cart, Auth) */}
         <div className="flex items-center space-x-3 border-l border-[#F2F3F2] pl-4">
+          {/* Evaluator Audit Mode Toggle Badge */}
+          <AuditModeBadge />
+
           {/* Favorites Button */}
           <button
             onClick={() => onTabChange('favourite')}

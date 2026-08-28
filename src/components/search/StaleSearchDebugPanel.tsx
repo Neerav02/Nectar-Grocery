@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import { Bug, CheckCircle2, XCircle, AlertTriangle, ShieldCheck, ShieldAlert, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useSearchStore } from '../../stores/useSearchStore';
+import { useAuditStore } from '../../stores/useAuditStore';
 import { PillButton } from '../common/PillButton';
 
 export const StaleSearchDebugPanel: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const isAuditModeEnabled = useAuditStore((state) => state.isAuditModeEnabled);
+  const [isOpen, setIsOpen] = useState(true);
   const isStaleProtectionEnabled = useSearchStore((state) => state.isStaleProtectionEnabled);
   const toggleStaleProtection = useSearchStore((state) => state.toggleStaleProtection);
   const requestLogs = useSearchStore((state) => state.requestLogs);
   const clearRequestLogs = useSearchStore((state) => state.clearRequestLogs);
   const executeSearch = useSearchStore((state) => state.executeSearch);
   const setQuery = useSearchStore((state) => state.setQuery);
+
+  if (!isAuditModeEnabled) {
+    return null;
+  }
 
   const handleSimulateRaceCondition = async () => {
     clearRequestLogs();
