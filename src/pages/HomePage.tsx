@@ -46,6 +46,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const banners = [
     {
       id: 0,
+      categoryId: 'fruits-veg',
       badge: 'Limited Deal',
       badgeColor: 'bg-[#53B175]',
       title: 'Fresh Vegetables',
@@ -59,6 +60,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     },
     {
       id: 1,
+      categoryId: 'fruits-veg',
       badge: 'Summer Special',
       badgeColor: 'bg-orange-500',
       title: 'Juicy Summer Fruits',
@@ -72,6 +74,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     },
     {
       id: 2,
+      categoryId: 'dairy-eggs',
       badge: 'Daily Fresh',
       badgeColor: 'bg-blue-500',
       title: 'Dairy & Morning Bakery',
@@ -84,6 +87,15 @@ export const HomePage: React.FC<HomePageProps> = ({
       cta: 'Shop Dairy',
     },
   ];
+
+  const handleBannerClick = (catId: string) => {
+    const targetCategory = INITIAL_CATEGORIES.find((c) => c.id === catId);
+    if (targetCategory) {
+      onSelectCategory(targetCategory);
+    } else {
+      onNavigateTab('explore');
+    }
+  };
 
   return (
     <div className="space-y-6 pb-24 md:pb-12 animate-fade-in">
@@ -119,11 +131,10 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </div>
 
-      {/* ── Promo Banner Carousel ── */}
-      <div className="relative overflow-hidden rounded-3xl shadow-lg">
-        {/* Slide strip — slides side-by-side, translateX scrolls them */}
+      {/* ── Interactive Hero Banner Carousel ── */}
+      <div className="relative w-full rounded-3xl overflow-hidden shadow-lg border border-[#E9EAEC] bg-[#181725] group">
         <div
-          className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+          className="flex transition-transform duration-700 ease-out h-52 sm:h-64 md:h-72"
           style={{ transform: `translateX(-${activeBannerIndex * 100}%)` }}
         >
           {banners.map((b) => {
@@ -131,17 +142,18 @@ export const HomePage: React.FC<HomePageProps> = ({
             return (
               <div
                 key={b.id}
-                className="min-w-full relative h-48 sm:h-60 md:h-64 overflow-hidden"
+                onClick={() => handleBannerClick(b.categoryId)}
+                className="w-full flex-shrink-0 relative h-full cursor-pointer select-none"
               >
-                {/* ── Full-bleed background image ── */}
+                {/* Full cover edge-to-edge banner background photo */}
                 <img
                   src={b.image}
                   alt={b.title}
-                  className="absolute inset-0 w-full h-full object-cover object-center"
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                   draggable={false}
                 />
 
-                {/* ── Left-to-right dark gradient overlay so text is readable ── */}
+                {/* Left-to-right dark gradient overlay so text is readable */}
                 <div
                   className={clsx(
                     'absolute inset-0 bg-gradient-to-r',
@@ -149,9 +161,8 @@ export const HomePage: React.FC<HomePageProps> = ({
                   )}
                 />
 
-                {/* ── Banner Content ── */}
+                {/* Banner Content */}
                 <div className="relative z-10 h-full flex flex-col justify-between p-5 sm:p-7">
-
                   {/* Top row: Badge + Discount tag */}
                   <div className="flex items-start justify-between">
                     {/* Badge pill */}
@@ -196,10 +207,14 @@ export const HomePage: React.FC<HomePageProps> = ({
                       </span>
                     </div>
 
-                    {/* Shop Now CTA */}
+                    {/* Shop Now CTA Button */}
                     <button
                       type="button"
-                      className="bg-white text-[#181725] text-xs font-extrabold px-4 py-2 rounded-xl shadow-md hover:bg-[#53B175] hover:text-white transition-all duration-200 active:scale-95"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBannerClick(b.categoryId);
+                      }}
+                      className="bg-white text-[#181725] text-xs font-extrabold px-4 py-2 rounded-xl shadow-md hover:bg-[#53B175] hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
                     >
                       {b.cta} →
                     </button>
@@ -210,12 +225,15 @@ export const HomePage: React.FC<HomePageProps> = ({
           })}
         </div>
 
-        {/* ── Dot Indicators ── */}
+        {/* Dot Indicators */}
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
           {banners.map((_, i) => (
             <button
               key={i}
-              onClick={() => setActiveBannerIndex(i)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveBannerIndex(i);
+              }}
               aria-label={`Slide ${i + 1}`}
               className={clsx(
                 'h-2 rounded-full transition-all duration-300',
