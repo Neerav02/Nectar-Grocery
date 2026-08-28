@@ -30,14 +30,14 @@ The Nectar application is structured into four distinct architectural layers:
 ┌─────────────────────────────────────────────────────────┐
 │           🌐 Simulated Latency & Data Service           │
 │    (mockApi.ts, AbortSignal guards, productsData.ts)    │
-└─────────────────────────────────────────────────────────┘
+└────────────────────────────┬────────────────────────────┘
 ```
 
 ---
 
 ## ⚡ Key Engineering Sub-Systems
 
-### 1. Stale Search Response Protection Subsystem
+### 1. Stale Search Response Protection Subsystem (Challenge A)
 - **Goal**: Prevent out-of-order asynchronous responses from updating the UI during rapid keyboard dispatches.
 - **Engine**: `useSearchStore.ts` + `mockApi.ts`
 - **Mechanism**:
@@ -45,7 +45,7 @@ The Nectar application is structured into four distinct architectural layers:
   - `activeRequestId` token validation verifies that incoming API responses match the latest request token.
   - Stale responses are discarded and registered in telemetry counters.
 
-### 2. Persisted Cart Catalog Reconciliation Subsystem
+### 2. Persisted Cart Catalog Reconciliation Subsystem (Challenge B)
 - **Goal**: Detect price shifts, stock bounds, and discontinued items upon application rehydration.
 - **Engine**: `useCartStore.ts` + Zustand `persist` middleware.
 - **Mechanism**:
@@ -54,8 +54,8 @@ The Nectar application is structured into four distinct architectural layers:
 
 ---
 
-## 🛠️ Automated Testing Strategy
+## 🛠️ Automated Testing & Quality Assurance Suite
 
-The repository includes a **Vitest unit test suite** (`npm test`) covering core store operations:
-- `src/test/searchStore.test.ts`: Verifies request cancellation and sequence ID token guards.
-- `src/test/cartStore.test.ts`: Verifies item addition, quantity adjustments, price recalculations, and catalog reconciliation.
+The repository features a **Vitest + jsdom automated test suite** (`npm test`) configured in `vite.config.ts`:
+- **`src/test/searchStore.test.ts`**: Fires overlapping slow (600ms) vs fast (50ms) search requests to explicitly prove that out-of-order stale responses are discarded and marked as `aborted`/`rejected_stale` in telemetry logs.
+- **`src/test/cartStore.test.ts`**: Tests 3 explicit catalog reconciliation edge cases: catalog price shifts (updating `addedAtPrice`), stock bound capping (reducing quantity to `stockQuantity`), and discontinued product removal (purging missing SKUs from cart state).

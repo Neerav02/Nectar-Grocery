@@ -13,6 +13,7 @@ This document records real engineering issues, unexpected build errors, state sy
 | **BUG-03** | UI / Layout | Checkout modal displaying vertical scrollbars on desktop. | `BottomSheet` max-width restricted to `md` (~448px) with tight padding. | Extended `BottomSheet` max-width variants to `xl` (~672px) and refactored card grid. | ✅ Resolved |
 | **BUG-04** | Navigation | Post-login redirecting to tracking page instead of main shop. | `accountSection` state remaining set to `'orders'` after order placement. | Reset `accountSection` to `'menu'` on login and set `activeTab` to `'shop'`. | ✅ Resolved |
 | **BUG-05** | Deployment | Direct URL refreshes (`/cart`, `/explore`) returning Vercel 404. | Vercel static server searching for file paths on disk instead of SPA routing. | Added `vercel.json` with wild-card rewrite rules (`"source": "/(.*)", "destination": "/index.html"`). | ✅ Resolved |
+| **BUG-06** | Testing Environment | `[zustand persist] Unable to update item 'nectar_cart_storage'` warning during test run. | Vitest default environment lacking browser `localStorage` mocks. | Installed `jsdom` and configured `test: { environment: 'jsdom' }` in `vite.config.ts`. | ✅ Resolved |
 
 ---
 
@@ -105,5 +106,20 @@ Created `vercel.json` with SPA wildcard rewrite rules:
 }
 ```
 
-#### Verification:
-Refreshed deep URLs directly on Vercel preview builds; verified 100% route hydration with zero 404 errors.
+---
+
+### 6. Issue BUG-06: Storage Unavailable Warning in Automated Vitest Environment
+
+#### Symptom:
+Executing `npm test` printed warnings to stderr:
+```bash
+[zustand persist middleware] Unable to update item 'nectar_cart_storage', the given storage is currently unavailable.
+```
+
+#### Diagnosis:
+The default Vitest test runner executed in a bare Node.js environment without browser DOM globals (`window.localStorage`).
+
+#### Fix Applied:
+1. Installed `jsdom` (`npm install -D jsdom`).
+2. Configured `test: { environment: 'jsdom' }` inside `vite.config.ts`.
+3. Re-ran `npx vitest run`; verified 100% clean test execution with zero storage warnings.
