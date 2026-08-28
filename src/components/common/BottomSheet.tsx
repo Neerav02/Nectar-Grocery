@@ -72,7 +72,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1">{children}</div>
+        <div className="px-6 pb-6 pt-2 overflow-hidden flex flex-col">{children}</div>
       </div>
     </div>
   );
