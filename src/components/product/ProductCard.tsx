@@ -4,6 +4,7 @@ import { Product } from '../../types';
 import { useCartStore } from '../../stores/useCartStore';
 import { useFavoritesStore } from '../../stores/useFavoritesStore';
 import { useToastStore } from '../../stores/useToastStore';
+import { ProductImage } from '../common/ProductImage';
 import { clsx } from 'clsx';
 
 interface ProductCardProps {
@@ -59,11 +60,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) =>
 
       {/* ── Product Image Stage (Full Cover Container) ── */}
       <div className="w-full h-36 sm:h-40 relative rounded-xl overflow-hidden bg-[#F4F5F4] mb-3">
-        <img
+        <ProductImage
           src={product.imageUrl}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-          loading="lazy"
         />
       </div>
 
