@@ -264,9 +264,27 @@ export const HomePage: React.FC<HomePageProps> = ({
         />
       </section>
 
+      {/* Bakery & Dairy Delights Section */}
+      <section>
+        <SectionHeader title="Bakery & Dairy Delights" onSeeAll={() => onNavigateTab('explore')} />
+        <ProductGrid
+          products={INITIAL_PRODUCTS.filter((p) => p.categoryId === 'bakery-snacks' || p.categoryId === 'dairy-eggs').slice(0, 4)}
+          onSelectProduct={onSelectProduct}
+        />
+      </section>
+
+      {/* Meat, Fish & Pantry Essentials Section */}
+      <section>
+        <SectionHeader title="Meat, Fish & Pantry Essentials" onSeeAll={() => onNavigateTab('explore')} />
+        <ProductGrid
+          products={INITIAL_PRODUCTS.filter((p) => p.categoryId === 'meat-fish' || p.categoryId === 'oil-ghee' || p.categoryId === 'staples-spices').slice(0, 4)}
+          onSelectProduct={onSelectProduct}
+        />
+      </section>
+
       {/* Groceries Categories Section */}
       <section>
-        <SectionHeader title="Groceries" onSeeAll={() => onNavigateTab('explore')} />
+        <SectionHeader title="Groceries Categories" onSeeAll={() => onNavigateTab('explore')} />
         <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-none">
           {INITIAL_CATEGORIES.map((cat) => (
             <div
