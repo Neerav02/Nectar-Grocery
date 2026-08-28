@@ -1,5 +1,6 @@
 import React from 'react';
 import { PillButton } from '../../components/common/PillButton';
+import { CarrotLogo } from '../../components/common/CarrotLogo';
 
 interface OnboardingPageProps {
   onGetStarted: () => void;
@@ -15,11 +16,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({ onGetStarted }) 
     >
       <div className="p-8 w-full text-center pb-12 animate-fade-in flex flex-col items-center">
         {/* Carrot Icon Logo */}
-        <img
-          src="/images/Icon.png"
-          alt="Nectar Logo"
-          className="w-12 h-14 object-contain mb-4 filter brightness-0 invert drop-shadow-md"
-        />
+        <CarrotLogo variant="white" className="w-12 h-14 mb-4 drop-shadow-md" />
 
         <h2 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight mb-3 tracking-tight">
           Welcome <br /> to our store

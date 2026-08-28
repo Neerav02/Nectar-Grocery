@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, MapPin, ShoppingCart, Heart, User } from 'lucide-react';
+import { CarrotLogo } from '../common/CarrotLogo';
 import { TabType } from '../../types';
 import { useCartStore } from '../../stores/useCartStore';
 import { useFavoritesStore } from '../../stores/useFavoritesStore';
@@ -43,11 +44,7 @@ export const NavbarDesktop: React.FC<NavbarDesktopProps> = ({
           role="button"
         >
           {/* Carrot Logo Mark */}
-          <img
-            src="/images/Icon.png"
-            alt="Nectar Logo"
-            className="w-8 h-9 object-contain group-hover:scale-105 transition-transform"
-          />
+          <CarrotLogo variant="color" className="w-8 h-9 group-hover:scale-105 transition-transform" />
           <div>
             <span className="text-2xl font-extrabold text-[#181725] tracking-tight group-hover:text-[#53B175] transition-colors">
               nectar
