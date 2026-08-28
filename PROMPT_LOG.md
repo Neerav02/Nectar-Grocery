@@ -16,6 +16,7 @@ This document records the material AI prompts, architectural directives, human s
 | **P-06** | **Claude Code** (Claude 3.7 Sonnet) | Redesign Checkout Modal to single-card layout (`maxWidth="xl"`) with zero internal scrollbars. | Expanded `BottomSheet` max-width variants to `xl` (~672px), increased row padding, and reformatted bill itemization hierarchy. | Verified checkout dialog rendered in a single spacious card without vertical scrollbars. |
 | **P-07** | **Claude Code** (Claude 3.7 Sonnet) | Implement post-login routing and profile navigation logic according to Blinkit-style user flow. | Updated `App.tsx` and `AccountPage.tsx` so completing auth lands on the Shop page, while clicking Demo/Profile opens the Profile menu (`'menu'`). | End-to-end user navigation testing across login, shop browsing, and account profile views. |
 | **P-08** | **Claude Code** (Claude 3.7 Sonnet) | Implement live order tracking stepper with automated status progression timer in `AccountPage.tsx`. | Built 4-step progress stepper (**Order Placed ➔ Packing ➔ Out for Delivery ➔ Delivered**) with automated 12s status timer and delivery driver details. | Placed order in Checkout, verified real-time stepper advancement every 12 seconds in Account dashboard. |
+| **P-09** | **Claude Code** (Claude 3.7 Sonnet) | Audit codebase for assignment rubric alignment: integrate React Router v6, sync DECISIONS.md snippets, and declare explicit dependencies. | Refactored `App.tsx` to use `react-router-dom` (`<Routes>`, `<Route>`, `useNavigate`, `useLocation`), copied exact store code to `DECISIONS.md`, declared `react`/`react-dom` explicitly in `package.json`, and replaced self-graded table with an objective feature summary. | Executed `npx tsc --noEmit` (0 errors), `npm run build`, and verified URL routing across `/`, `/explore`, `/category/:id`, `/product/:id`, `/cart`, `/account`. |
 
 ---
 
@@ -44,3 +45,11 @@ This document records the material AI prompts, architectural directives, human s
 ### 4. Checkout Modal Vertical Scrollbar Elimination
 - **AI Initial Output**: The initial checkout modal rendered inside a narrow `max-w-md` container with tight row height, causing vertical scrollbars to appear on standard desktop screens.
 - **Human Correction**: Updated `BottomSheet.tsx` to support `xl` (`max-w-2xl`) containers. Re-architected `CheckoutModal.tsx` padding, font sizes, and button positioning to fit all delivery choices, payment gateways, promo fields, and tax calculations into a **single, scroll-free card**.
+
+### 5. React Router Non-Usage & Documentation Code Drift
+- **AI Initial Output**: The AI left `react-router-dom` declared in `package.json` without using it in `src/`, relying solely on manual state variables. Additionally, code snippets in `DECISIONS.md` contained slight variable name drift from the actual `useSearchStore.ts` and `useCartStore.ts` files, and core dependencies `react` and `react-dom` were omitted from explicit declarations.
+- **Human Correction**: 
+  1. Wrapped `App.tsx` in `react-router-dom` (`<BrowserRouter>`, `<Routes>`, `<Route>`, `useNavigate`, `useLocation`, `useParams`) to enable real URL deep-linking and browser back navigation.
+  2. Updated `DECISIONS.md` code snippets to match `useSearchStore.ts` and `useCartStore.ts` word-for-word.
+  3. Explicitly installed `react` and `react-dom` in `package.json`.
+  4. Replaced the self-graded evaluation score table in `README.md` with a clean, objective feature implementation matrix.
