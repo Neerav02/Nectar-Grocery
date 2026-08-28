@@ -175,47 +175,47 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title="Checkout">
-      <div className="flex flex-col justify-between space-y-3 overflow-hidden select-none">
+    <BottomSheet isOpen={isOpen} onClose={onClose} title="Checkout" maxWidth="xl">
+      <div className="flex flex-col justify-between space-y-4 overflow-hidden select-none">
         
-        {/* Compact Address Row */}
-        <div className="bg-[#EEF8F2] border border-[#53B175]/30 rounded-xl px-3 py-2 flex items-center justify-between">
-          <div className="flex items-center space-x-2 truncate">
-            <MapPin className="w-4 h-4 text-[#53B175] shrink-0" />
-            <span className="text-xs font-extrabold text-[#181725] truncate">
+        {/* Delivery Address Row */}
+        <div className="bg-[#EEF8F2] border border-[#53B175]/30 rounded-2xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center space-x-3 truncate">
+            <MapPin className="w-5 h-5 text-[#53B175] shrink-0" />
+            <span className="text-sm font-extrabold text-[#181725] truncate">
               {userLocation.area}, {userLocation.city}
             </span>
           </div>
-          <span className="text-[10px] font-extrabold text-[#53B175] bg-white px-2 py-0.5 rounded-full border border-[#53B175]/30 shrink-0">
+          <span className="text-xs font-extrabold text-[#53B175] bg-white px-2.5 py-1 rounded-full border border-[#53B175]/30 shrink-0">
             Verified
           </span>
         </div>
 
         {/* Options List */}
-        <div className="divide-y divide-[#F2F3F2] border-y border-[#F2F3F2] text-xs">
+        <div className="divide-y divide-[#F2F3F2] border-y border-[#F2F3F2] text-sm">
           
           {/* Delivery Speed Row */}
-          <div className="py-2.5 flex flex-col">
+          <div className="py-3 flex flex-col">
             <div
               onClick={() => setShowDeliveryPicker(!showDeliveryPicker)}
-              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-1 py-1 rounded-lg"
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-2 py-1.5 rounded-xl transition-colors"
             >
-              <div className="flex items-center space-x-2 text-[#7C7C7C]">
-                <Truck className="w-4 h-4 text-gray-600" />
-                <span className="text-[#181725] font-extrabold">Delivery Speed</span>
+              <div className="flex items-center space-x-3 text-[#7C7C7C]">
+                <Truck className="w-5 h-5 text-gray-600" />
+                <span className="text-[#181725] font-extrabold text-sm">Delivery Speed</span>
               </div>
-              <div className="flex items-center space-x-1 font-bold text-[#53B175]">
-                <span>{getDeliveryLabel()}</span>
+              <div className="flex items-center space-x-1.5 font-bold text-[#53B175]">
+                <span className="text-sm">{getDeliveryLabel()}</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
 
             {showDeliveryPicker && (
-              <div className="mt-2 p-2 bg-[#F8F9FA] rounded-xl space-y-1 border border-gray-200">
+              <div className="mt-2 p-2.5 bg-[#F8F9FA] rounded-2xl space-y-1.5 border border-gray-200">
                 <button
                   type="button"
                   onClick={() => { setDeliveryMethod('express'); setShowDeliveryPicker(false); }}
-                  className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-bold ${
+                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold ${
                     deliveryMethod === 'express' ? 'bg-[#EEF8F2] text-[#53B175] border border-[#53B175]' : 'bg-white text-[#181725]'
                   }`}
                 >
@@ -225,7 +225,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <button
                   type="button"
                   onClick={() => { setDeliveryMethod('standard'); setShowDeliveryPicker(false); }}
-                  className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-bold ${
+                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold ${
                     deliveryMethod === 'standard' ? 'bg-[#EEF8F2] text-[#53B175] border border-[#53B175]' : 'bg-white text-[#181725]'
                   }`}
                 >
@@ -237,27 +237,27 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </div>
 
           {/* Payment Method Row */}
-          <div className="py-2.5 flex flex-col">
+          <div className="py-3 flex flex-col">
             <div
               onClick={() => setShowPaymentPicker(!showPaymentPicker)}
-              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-1 py-1 rounded-lg"
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-2 py-1.5 rounded-xl transition-colors"
             >
-              <div className="flex items-center space-x-2 text-[#7C7C7C]">
-                <CreditCard className="w-4 h-4 text-gray-600" />
-                <span className="text-[#181725] font-extrabold">Payment Method</span>
+              <div className="flex items-center space-x-3 text-[#7C7C7C]">
+                <CreditCard className="w-5 h-5 text-gray-600" />
+                <span className="text-[#181725] font-extrabold text-sm">Payment Method</span>
               </div>
-              <div className="flex items-center space-x-1 font-bold text-[#181725]">
-                <span>{getPaymentLabel()}</span>
+              <div className="flex items-center space-x-1.5 font-bold text-[#181725]">
+                <span className="text-sm">{getPaymentLabel()}</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
 
             {showPaymentPicker && (
-              <div className="mt-2 p-2 bg-[#F8F9FA] rounded-xl space-y-1 border border-gray-200">
+              <div className="mt-2 p-2.5 bg-[#F8F9FA] rounded-2xl space-y-1.5 border border-gray-200">
                 <button
                   type="button"
                   onClick={() => { setPaymentMethod('upi_gpay'); setShowPaymentPicker(false); }}
-                  className="w-full flex items-center justify-between p-2 bg-white rounded-lg text-xs font-bold text-[#181725] hover:bg-gray-100"
+                  className="w-full flex items-center justify-between p-2.5 bg-white rounded-xl text-xs font-bold text-[#181725] hover:bg-gray-100"
                 >
                   <span>📱 Google Pay / UPI</span>
                   {paymentMethod === 'upi_gpay' && <Check className="w-4 h-4 text-[#53B175]" />}
@@ -265,7 +265,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <button
                   type="button"
                   onClick={() => { setPaymentMethod('upi_phonepe'); setShowPaymentPicker(false); }}
-                  className="w-full flex items-center justify-between p-2 bg-white rounded-lg text-xs font-bold text-[#181725] hover:bg-gray-100"
+                  className="w-full flex items-center justify-between p-2.5 bg-white rounded-xl text-xs font-bold text-[#181725] hover:bg-gray-100"
                 >
                   <span>💜 PhonePe / BHIM UPI</span>
                   {paymentMethod === 'upi_phonepe' && <Check className="w-4 h-4 text-[#53B175]" />}
@@ -273,7 +273,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <button
                   type="button"
                   onClick={() => { setPaymentMethod('card_visa'); setShowPaymentPicker(false); }}
-                  className="w-full flex items-center justify-between p-2 bg-white rounded-lg text-xs font-bold text-[#181725] hover:bg-gray-100"
+                  className="w-full flex items-center justify-between p-2.5 bg-white rounded-xl text-xs font-bold text-[#181725] hover:bg-gray-100"
                 >
                   <span>💳 Visa **** 4242</span>
                   {paymentMethod === 'card_visa' && <Check className="w-4 h-4 text-[#53B175]" />}
@@ -281,7 +281,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <button
                   type="button"
                   onClick={() => { setPaymentMethod('cod'); setShowPaymentPicker(false); }}
-                  className="w-full flex items-center justify-between p-2 bg-white rounded-lg text-xs font-bold text-[#181725] hover:bg-gray-100"
+                  className="w-full flex items-center justify-between p-2.5 bg-white rounded-xl text-xs font-bold text-[#181725] hover:bg-gray-100"
                 >
                   <span>💵 Cash on Delivery</span>
                   {paymentMethod === 'cod' && <Check className="w-4 h-4 text-[#53B175]" />}
@@ -291,53 +291,53 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </div>
 
           {/* Promo Code Row */}
-          <div className="py-2.5 flex flex-col">
+          <div className="py-3 flex flex-col">
             <div
               onClick={() => setShowPromoPicker(!showPromoPicker)}
-              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-1 py-1 rounded-lg"
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-50 px-2 py-1.5 rounded-xl transition-colors"
             >
-              <div className="flex items-center space-x-2 text-[#7C7C7C]">
-                <Tag className="w-4 h-4 text-gray-600" />
-                <span className="text-[#181725] font-extrabold">Promo Code</span>
+              <div className="flex items-center space-x-3 text-[#7C7C7C]">
+                <Tag className="w-5 h-5 text-gray-600" />
+                <span className="text-[#181725] font-extrabold text-sm">Promo Code</span>
               </div>
-              <div className="flex items-center space-x-1 font-bold text-[#181725]">
+              <div className="flex items-center space-x-1.5 font-bold text-[#181725]">
                 {appliedPromo ? (
-                  <span className="text-[#53B175] bg-[#EEF8F2] px-2 py-0.5 rounded-md text-[11px]">
+                  <span className="text-[#53B175] bg-[#EEF8F2] px-2.5 py-1 rounded-lg text-xs font-extrabold">
                     🏷️ {appliedPromo.code} (-${discountAmount.toFixed(2)})
                   </span>
                 ) : (
-                  <span className="text-gray-400 font-normal">Pick discount offer</span>
+                  <span className="text-gray-400 font-normal text-sm">Pick discount offer</span>
                 )}
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
 
             {showPromoPicker && (
-              <div className="mt-2 p-2 bg-[#F8F9FA] rounded-xl space-y-2 border border-gray-200">
-                <div className="flex space-x-1">
+              <div className="mt-2 p-2.5 bg-[#F8F9FA] rounded-2xl space-y-2 border border-gray-200">
+                <div className="flex space-x-2">
                   <input
                     type="text"
                     value={promoInput}
                     onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
                     placeholder="ENTER CODE (NECTAR10)"
-                    className="flex-1 px-2 py-1 bg-white border rounded text-xs uppercase font-bold"
+                    className="flex-1 px-3 py-1.5 bg-white border border-gray-300 rounded-xl text-xs uppercase font-bold"
                   />
                   <button
                     type="button"
                     onClick={() => handleApplyPromoCode(promoInput)}
-                    className="bg-[#53B175] text-white px-3 py-1 rounded text-xs font-bold"
+                    className="bg-[#53B175] text-white px-4 py-1.5 rounded-xl text-xs font-bold"
                   >
                     Apply
                   </button>
                 </div>
-                {promoError && <p className="text-[10px] text-red-500 font-bold">{promoError}</p>}
-                <div className="flex gap-1 flex-wrap pt-1">
+                {promoError && <p className="text-xs text-red-500 font-bold">{promoError}</p>}
+                <div className="flex gap-1.5 flex-wrap pt-1">
                   {AVAILABLE_PROMOS.map((p) => (
                     <button
                       key={p.code}
                       type="button"
                       onClick={() => handleApplyPromoCode(p.code)}
-                      className="bg-white border text-[#53B175] px-2 py-0.5 rounded text-[10px] font-extrabold hover:bg-[#EEF8F2]"
+                      className="bg-white border text-[#53B175] px-2.5 py-1 rounded-lg text-xs font-extrabold hover:bg-[#EEF8F2]"
                     >
                       {p.code}
                     </button>
@@ -348,8 +348,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </div>
         </div>
 
-        {/* Compact Bill Summary Box */}
-        <div className="bg-[#F8F9FA] rounded-xl p-3 space-y-1 border border-gray-200 text-xs">
+        {/* Bill Summary Box */}
+        <div className="bg-[#F8F9FA] rounded-2xl p-4 space-y-1.5 border border-gray-200 text-xs sm:text-sm">
           <div className="flex items-center justify-between text-[#7C7C7C] font-semibold">
             <span>Items Subtotal</span>
             <span className="text-[#181725] font-extrabold">${subtotal.toFixed(2)}</span>
@@ -374,21 +374,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </div>
           )}
 
-          <div className="pt-1.5 border-t border-gray-200 flex items-center justify-between text-sm font-extrabold text-[#181725]">
+          <div className="pt-2 border-t border-gray-200 flex items-center justify-between text-base font-extrabold text-[#181725]">
             <span>Grand Total</span>
-            <span className="text-[#53B175] text-base font-extrabold">${grandTotal.toFixed(2)}</span>
+            <span className="text-[#53B175] text-lg font-extrabold">${grandTotal.toFixed(2)}</span>
           </div>
         </div>
 
         {/* Discreet Simulation Switch */}
-        <div className="flex items-center justify-between px-1 text-[11px] text-gray-500">
+        <div className="flex items-center justify-between px-1 text-xs text-gray-500">
           <span className="font-semibold">
             Simulation Test: {simulateFailure ? '🔴 Fail Mode' : '🟢 Success Mode'}
           </span>
           <button
             type="button"
             onClick={() => setSimulateFailure(!simulateFailure)}
-            className="text-[10px] font-bold text-[#53B175] underline hover:text-[#439c63]"
+            className="text-xs font-bold text-[#53B175] underline hover:text-[#439c63]"
           >
             Toggle Mode
           </button>

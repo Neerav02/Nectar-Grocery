@@ -7,7 +7,7 @@ interface BottomSheetProps {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
 export const BottomSheet: React.FC<BottomSheetProps> = ({
@@ -40,7 +40,9 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   const maxWidthClasses = {
     sm: 'max-w-md',
     md: 'max-w-lg',
-    lg: 'max-w-2xl',
+    lg: 'max-w-xl',
+    xl: 'max-w-2xl',
+    '2xl': 'max-w-3xl',
   };
 
   return (
