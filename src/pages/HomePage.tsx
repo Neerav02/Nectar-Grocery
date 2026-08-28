@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, ShoppingBag, Flame, Leaf } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { ProductGrid } from '../components/product/ProductGrid';
 import { Product, Category, TabType } from '../types';
@@ -34,24 +34,54 @@ export const HomePage: React.FC<HomePageProps> = ({
   const exclusiveProducts = INITIAL_PRODUCTS.filter((p) => p.isExclusive);
   const bestSellingProducts = INITIAL_PRODUCTS.filter((p) => p.isBestSelling);
 
+  // Simulated live order count that ticks up every few seconds
+  const [orderCount, setOrderCount] = useState(2847);
+  useEffect(() => {
+    const counter = setInterval(() => {
+      setOrderCount((prev) => prev + Math.floor(Math.random() * 3 + 1));
+    }, 3500);
+    return () => clearInterval(counter);
+  }, []);
+
   const banners = [
     {
+      id: 0,
+      badge: 'Limited Deal',
+      badgeColor: 'bg-[#53B175]',
       title: 'Fresh Vegetables',
-      subtitle: 'Get Up To 40% OFF',
-      bg: 'from-emerald-700 to-teal-900',
-      image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=800&q=80',
+      titleHighlight: 'Up to 40% OFF',
+      subtitle: 'Farm-to-table organic greens, delivered in under 1 hour.',
+      discount: '40%',
+      accentColor: 'from-emerald-900/80 via-emerald-800/60 to-transparent',
+      image: '/images/banner_vegetables.png',
+      stat: { icon: Leaf, label: 'organic items', value: '500+' },
+      cta: 'Shop Vegetables',
     },
     {
+      id: 1,
+      badge: 'Summer Special',
+      badgeColor: 'bg-orange-500',
       title: 'Juicy Summer Fruits',
-      subtitle: '100% Organic & Farm Fresh',
-      bg: 'from-amber-600 to-orange-800',
-      image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=800&q=80',
+      titleHighlight: '100% Farm Fresh',
+      subtitle: 'Handpicked tropical fruits, rich in vitamins and taste.',
+      discount: '25%',
+      accentColor: 'from-orange-900/85 via-orange-800/55 to-transparent',
+      image: '/images/banner_fruits.png',
+      stat: { icon: Flame, label: 'orders today', value: orderCount.toLocaleString() },
+      cta: 'Shop Fruits',
     },
     {
+      id: 2,
+      badge: 'Daily Fresh',
+      badgeColor: 'bg-blue-500',
       title: 'Dairy & Morning Bakery',
-      subtitle: 'Fresh Milk & Brown Eggs',
-      bg: 'from-blue-600 to-indigo-900',
-      image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=800&q=80',
+      titleHighlight: 'Fresh Every Morning',
+      subtitle: 'Pure milk, artisan bread and farm eggs at your door.',
+      discount: '15%',
+      accentColor: 'from-indigo-900/85 via-indigo-800/55 to-transparent',
+      image: '/images/banner_dairy.png',
+      stat: { icon: ShoppingBag, label: 'happy customers', value: '12k+' },
+      cta: 'Shop Dairy',
     },
   ];
 
@@ -89,52 +119,110 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </div>
 
-      {/* Promo Banner Carousel */}
-      <div className="relative overflow-hidden rounded-3xl shadow-sm border border-[#E2E2E2]">
+      {/* ── Promo Banner Carousel ── */}
+      <div className="relative overflow-hidden rounded-3xl shadow-lg">
+        {/* Slide strip — slides side-by-side, translateX scrolls them */}
         <div
-          className="flex transition-transform duration-500 ease-out"
+          className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
           style={{ transform: `translateX(-${activeBannerIndex * 100}%)` }}
         >
-          {banners.map((b, i) => (
-            <div
-              key={i}
-              className={clsx(
-                'min-w-full h-44 sm:h-52 bg-gradient-to-r p-6 sm:p-8 text-white flex items-center justify-between relative overflow-hidden',
-                b.bg
-              )}
-            >
-              <div className="max-w-[60%] z-10">
-                <span className="inline-block bg-white/20 backdrop-blur-xs text-white text-xs font-bold px-2.5 py-1 rounded-full mb-2 uppercase tracking-wider">
-                  Special Deal
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold leading-tight mb-1">
-                  {b.title}
-                </h3>
-                <p className="text-sm font-semibold text-emerald-200">{b.subtitle}</p>
-              </div>
-
-              <div className="absolute right-[-20px] bottom-[-20px] w-48 h-48 opacity-90">
+          {banners.map((b) => {
+            const StatIcon = b.stat.icon;
+            return (
+              <div
+                key={b.id}
+                className="min-w-full relative h-48 sm:h-60 md:h-64 overflow-hidden"
+              >
+                {/* ── Full-bleed background image ── */}
                 <img
                   src={b.image}
                   alt={b.title}
-                  className="w-full h-full object-cover rounded-full filter drop-shadow-lg"
+                  className="absolute inset-0 w-full h-full object-cover object-center"
+                  draggable={false}
                 />
+
+                {/* ── Left-to-right dark gradient overlay so text is readable ── */}
+                <div
+                  className={clsx(
+                    'absolute inset-0 bg-gradient-to-r',
+                    b.accentColor
+                  )}
+                />
+
+                {/* ── Banner Content ── */}
+                <div className="relative z-10 h-full flex flex-col justify-between p-5 sm:p-7">
+
+                  {/* Top row: Badge + Discount tag */}
+                  <div className="flex items-start justify-between">
+                    {/* Badge pill */}
+                    <span
+                      className={clsx(
+                        'inline-flex items-center text-white text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest shadow-md',
+                        b.badgeColor
+                      )}
+                    >
+                      {b.badge}
+                    </span>
+
+                    {/* Discount bubble */}
+                    <div className="bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-2xl px-3 py-1 text-center shadow-lg">
+                      <p className="text-xl font-extrabold leading-none">{b.discount}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider opacity-90">OFF</p>
+                    </div>
+                  </div>
+
+                  {/* Middle: Title & subtitle */}
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight drop-shadow-md">
+                      {b.title}
+                    </h2>
+                    <p className="text-sm font-semibold text-white/80 mt-1 max-w-xs leading-snug drop-shadow">
+                      {b.subtitle}
+                    </p>
+                  </div>
+
+                  {/* Bottom row: Live stat counter + CTA */}
+                  <div className="flex items-end justify-between">
+                    {/* Animated live-stat badge */}
+                    <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm border border-white/20 text-white rounded-xl px-3 py-1.5 shadow">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#53B175] opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#53B175]" />
+                      </span>
+                      <StatIcon className="w-3.5 h-3.5 text-white/80" />
+                      <span className="text-xs font-extrabold">
+                        <span className="text-[#53B175]">{b.stat.value}</span>{' '}
+                        <span className="text-white/80 font-semibold">{b.stat.label}</span>
+                      </span>
+                    </div>
+
+                    {/* Shop Now CTA */}
+                    <button
+                      type="button"
+                      className="bg-white text-[#181725] text-xs font-extrabold px-4 py-2 rounded-xl shadow-md hover:bg-[#53B175] hover:text-white transition-all duration-200 active:scale-95"
+                    >
+                      {b.cta} →
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Carousel Dot Indicators */}
-        <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center space-x-2 z-20">
+        {/* ── Dot Indicators ── */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
           {banners.map((_, i) => (
             <button
               key={i}
               onClick={() => setActiveBannerIndex(i)}
+              aria-label={`Slide ${i + 1}`}
               className={clsx(
                 'h-2 rounded-full transition-all duration-300',
-                activeBannerIndex === i ? 'w-6 bg-[#53B175]' : 'w-2 bg-white/60 hover:bg-white'
+                activeBannerIndex === i
+                  ? 'w-7 bg-white shadow-md'
+                  : 'w-2 bg-white/50 hover:bg-white/80'
               )}
-              aria-label={`Go to slide ${i + 1}`}
             />
           ))}
         </div>
